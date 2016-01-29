@@ -12,12 +12,8 @@
 * @license  http://opensource.org/licenses/gpl-license.php GNU Public License
 * @link     https://github.com/isma91/display_download/blob/master/controllers/list_file.php
 */
-ini_set('xdebug.var_display_max_depth', -1);
-ini_set('xdebug.var_display_max_children', -1);
-ini_set('xdebug.var_display_max_data', -1);
 /* take the all path of the directory */
-$directory = '/home/isma91/Téléchargements/';
-//$directory = '$_POST["directory"]';
+$directory = $_POST["directory"];
 $list_directory = scandir($directory);
 $array_file = array();
 $array_folder = array();
