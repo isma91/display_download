@@ -13,7 +13,7 @@
 * @link     https://github.com/isma91/display_download/blob/master/controllers/list_file.php
 */
 /* take the all path of the directory */
-$directory = $_POST["directory"];
+$directory = rtrim($_POST["directory"], '/') . '/';
 $list_directory = scandir($directory);
 $array_file = array();
 $array_folder = array();
