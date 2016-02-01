@@ -26,5 +26,10 @@ foreach ($list_directory as $file) {
 		}
 	}
 }
-$all_array = array('folder' => $array_folder, 'file' => $array_file);
+if ($directory === "/") {
+	$array_path = array("/");
+} else {
+	$array_path = explode('/', $directory);
+}
+$all_array = array('folder' => $array_folder, 'file' => $array_file, 'path' => $array_path);
 echo json_encode($all_array);
