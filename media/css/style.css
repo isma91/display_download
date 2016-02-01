@@ -1,0 +1,107 @@
+@font-face {
+	font-family: 'Pacifico';
+	font-style: normal;
+	src: url('../font/Pacifico.ttf');
+}
+html,body {
+	height:100%;
+	margin: 0px;
+	padding: 0px;
+	font-family: 'Abel', sans-serif;
+}
+#title {
+	text-align: center;
+	margin: auto;
+	font-family: 'Pacifico', cursive;
+	font-size: 2em;
+}
+.mui-panel,
+.title {
+	text-align: center;
+	margin: auto;
+}
+textarea.materialize-textarea:focus:not([readonly]) {
+	border-bottom: 1px solid #000000;
+	box-shadow: 0 1px 0 0 #000000;
+}
+textarea.materialize-textarea:focus:not([readonly]) + label {
+	color: #000000;
+}
+.input-field label,
+.input-field .prefix,
+.materialize-textarea label,
+.materialize-textarea .prefix {
+	color: #808080;
+}
+.input-field input[type=text]:focus + label,
+.input-field input[type=password]:focus + label,
+.materialize-textarea:focus + label,
+.input-field .prefix.active {
+	color: #000000;
+}
+.input-field input[type=text]:focus,
+.input-field input[type=password]:focus,
+.materialize-textarea:focus {
+	border-bottom: 1px solid #000000;
+	box-shadow: 0 1px 0 0 #000000;
+}
+.input-field input[type=text].valid,
+.input-field input[type=password].valid,
+.materialize-textarea.valid {
+	border-bottom: 1px solid #008000;
+	box-shadow: 0 1px 0 0 #008000;
+}
+.input-field input[type=text].invalid,
+.input-field input[type=password].invalid,
+.input-field textarea.invalid {
+	border-bottom: 1px solid #FF0000;
+	box-shadow: 0 1px 0 0 #FF0000;
+}
+.mui-btn--raised:hover,
+.btn:hover {
+	background-color: #D3D3D3;
+	color: black;
+}
+.mui-btn--raised:focus,
+.btn:focus {
+	outline: none;
+	background-color: #808080;
+	color: black;
+}
+.alert-success {
+	width: 100%;
+	margin: auto;
+	text-align: center;
+	background-color: green;
+}
+.alert-failed {
+	width: 100%;
+	margin: auto;
+	text-align: center;
+	background-color: red;
+}
+.incomplete {
+	color: red;
+}
+.mui-appbar {
+	background-color: #A9A9A9;
+}
+.btn-large {
+	background-color: #858585;
+}
+.btn-large:hover {
+	background-color: #C6C6C6;
+}
+.btn-large:focus {
+	background-color: #858585;
+}
+[type="checkbox"].filled-in:checked+label:after {
+	background-color: #000000;
+	border: 2px solid #000000;
+}
+.absolute_center {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
