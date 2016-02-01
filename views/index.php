@@ -37,19 +37,19 @@
 <![endif]-->
 </head>
 <body>
-    <div class="container">
-    <div class="row mui-panel">
-        <h1 id="title">Welcome to display_download !!</h1>
-        <h2 class="title">Write your absolute path in the input and click to the button !!</h2>
-    </div>
-       <div class="row absolute_center mui-panel">
-        <div class="input-field col s12">
-          <i class="material-icons prefix">web_assets</i>
-          <input id="path" type="text" value="/home/<your_name>/Downloads">
-          <label for="path">Path</label>
-          <button class="waves-effect waves-light mui-btn mui-btn--raised" id="send_path">Go In !!</button>
+    <div class="container" id="the_body">
+        <div class="row mui-panel" id="the_menu">
+            <h1 id="title">Welcome to display_download !!</h1>
+            <h2 class="title">Write your absolute path in the input and click to the button !!</h2>
+        </div>
+        <div class="row absolute_center mui-panel" id="absolute_center_form">
+            <div class="input-field col s12">
+              <i class="material-icons prefix">web_assets</i>
+              <input id="path" type="text" value="/home/<your_name>/Downloads">
+              <label for="path">Path</label>
+              <button class="waves-effect waves-light mui-btn mui-btn--raised" id="send_path">Go In !!</button>
+          </div>
       </div>
   </div>
-</div>
 </body>
 </html>
