@@ -105,3 +105,19 @@ textarea.materialize-textarea:focus:not([readonly]) + label {
 	left: 50%;
 	transform: translate(-50%, -50%);
 }
+.progress {
+	background-color: #A6A6A6;
+}
+.progress .indeterminate {
+	background-color: #000000;
+}
+nav {
+	background-color: #A9A9A9;
+}
+.breadcrumb,
+a .breadcrumb,
+a .breadcrumb:hover,
+a .breadcrumb:focus {
+	color: #FFFFFF;
+	text-decoration: none;
+}
