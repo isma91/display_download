@@ -22,7 +22,7 @@ foreach ($list_directory as $file) {
 		if (is_dir($directory.$file)) {
 			array_push($array_folder, $file);
 		} else {
-			array_push($array_file, $file);
+			$array_file[pathinfo($file, PATHINFO_EXTENSION)][] = $file;
 		}
 	}
 }
