@@ -121,3 +121,16 @@ a .breadcrumb:focus {
 	color: #FFFFFF;
 	text-decoration: none;
 }
+.right {
+	margin-right: 10px;
+}
+#path_content {
+	margin: auto;
+}
+.icons {
+	width: 4rem;
+}
+nav .brand-logo {
+	position: relative;
+	float: left;
+}
