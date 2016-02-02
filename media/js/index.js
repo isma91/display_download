@@ -5,7 +5,7 @@
 $(document).ready(function () {
     function send_path () {
         "use strict";
-        var path, breadcrumb;
+        var path, breadcrumb, folders, files;
         path = $('#path').val();
         if (path !== "") {
             $.post('controllers/list_file.php', {directory: path}, function (data, textStatus, xhr) {
@@ -23,15 +23,41 @@ $(document).ready(function () {
                                 }
                             });
                         }
-                        $('#the_menu').html(' <nav><div class="nav-wrapper"><a href="#" class="brand-logo">Logo</a><div class="right hide-on-med-and-down">' + breadcrumb + '</div></div></nav>');
+                        $('#the_menu').html(' <nav><div class="nav-wrapper"><a href="#" class="brand-logo">Display_Download</a><div class="right">' + breadcrumb + '</div></div></nav>');
                         $('#the_body').append('<div class="row mui-panel " id="loader"><div class="progress"><div class="indeterminate"></div></div></div>');
                         $('#loader').css({'margin-top': '25%'});
                         $('#the_menu').html();
                         setTimeout(function () {
+                            console.log(data);
                             $('#loader').remove();
                             $('#the_body').append('<div class="row mui-panel">There is ' + data.folder.length + ' folder(s) and ' + data.file.length + ' file(s)</div>');
                             $('#the_body').append('<div class="row mui-panel"></div>');
-                            console.log(data);
+                            if (data.folder.length !== 0) {
+                                folders = '';
+                                $.each(data.folder, function (index, folder) {
+                                    if (folder === ".git") {
+                                        folders = folders + '<div class="col s3"><img class="icons" src="media/img/icons/git.png" alt="git folder" /><p class="folder_name">' + folder + '</p></div>';
+                                    } else if (folder === ".idea") {
+                                        folders = folders + '<div class="col s3"><img class="icons" src="media/img/icons/phpstorm.png" alt="phpstorm folder" /><p class="folder_name">' + folder + '</p></div>';
+                                    } else {
+                                        folders = folders + '<div class="col s3"><img class="icons" src="media/img/icons/folder.png" alt="folder" /><p class="folder_name">' + folder + '</p></div>';
+                                    }
+                                });
+                            }
+                            if (data.folder.length !== 0) {
+                                files = '';
+                                $.each(data.file, function (extension, array_file) {
+                                    if (extension === "") {
+                                        extension = "txt";
+                                    } else if (extension === "phar") {
+                                        extension = "php";
+                                    }
+                                    $.each(array_file, function (index, file) {
+                                        files = files + '<div class="col s3"><img class="icons" src="media/img/icons/' + extension + '.png" alt="' + extension + ' file" /><p class="file_name">' + file + '</p></div>';
+                                    });
+                                });
+                            }
+                            $('#the_body').append('<div class="row"><div class="mui-panel" id="path_content"><div class="row>"' + folders + files + '</div></div></div>');
                         }, 1000);
                     }
                 }
