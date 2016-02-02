@@ -28,19 +28,18 @@ $(document).ready(function () {
                         $('#loader').css({'margin-top': '25%'});
                         $('#the_menu').html();
                         setTimeout(function () {
-                            console.log(data);
+                            console.log(data)
                             $('#loader').remove();
                             $('#the_body').append('<div class="row mui-panel">There is ' + data.folder.length + ' folder(s) and ' + data.file.length + ' file(s)</div>');
-                            $('#the_body').append('<div class="row mui-panel"></div>');
                             if (data.folder.length !== 0) {
                                 folders = '';
                                 $.each(data.folder, function (index, folder) {
                                     if (folder === ".git") {
-                                        folders = folders + '<div class="col s3"><img class="icons" src="media/img/icons/git.png" alt="git folder" /><p class="folder_name">' + folder + '</p></div>';
+                                        folders = folders + '<div class="folder col s3"><img class="icons" src="media/img/icons/git.png" alt="git folder" /><p class="folder_name">' + folder + '</p></div>';
                                     } else if (folder === ".idea") {
-                                        folders = folders + '<div class="col s3"><img class="icons" src="media/img/icons/phpstorm.png" alt="phpstorm folder" /><p class="folder_name">' + folder + '</p></div>';
+                                        folders = folders + '<div class="folder col s3"><img class="icons" src="media/img/icons/phpstorm.png" alt="phpstorm folder" /><p class="folder_name">' + folder + '</p></div>';
                                     } else {
-                                        folders = folders + '<div class="col s3"><img class="icons" src="media/img/icons/folder.png" alt="folder" /><p class="folder_name">' + folder + '</p></div>';
+                                        folders = folders + '<div class="folder col s3"><img class="icons" src="media/img/icons/folder.png" alt="folder" /><p class="folder_name">' + folder + '</p></div>';
                                     }
                                 });
                             }
@@ -53,11 +52,11 @@ $(document).ready(function () {
                                         extension = "php";
                                     }
                                     $.each(array_file, function (index, file) {
-                                        files = files + '<div class="col s3"><img class="icons" src="media/img/icons/' + extension + '.png" alt="' + extension + ' file" /><p class="file_name">' + file + '</p></div>';
+                                        files = files + '<div class="file col s3"><img class="icons" src="media/img/icons/' + extension + '.png" alt="' + extension + ' file" /><p class="file_name">' + file + '</p></div>';
                                     });
                                 });
                             }
-                            $('#the_body').append('<div class="row"><div class="mui-panel" id="path_content"><div class="row>"' + folders + files + '</div></div></div>');
+                            $('#the_body').append('<div class="row"><div class="mui-panel" id="path_content"><div class="row">' + folders + files + '</div></div></div>');
                         }, 1000);
                     }
                 }
