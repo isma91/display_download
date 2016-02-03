@@ -51,5 +51,6 @@
           </div>
       </div>
   </div>
+  <span id="current_path"></span>
 </body>
 </html>
