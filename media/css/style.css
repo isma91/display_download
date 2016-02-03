@@ -134,3 +134,12 @@ nav .brand-logo {
 	position: relative;
 	float: left;
 }
+.folder:hover,
+.file:hover {
+	background-color: #CCCCCC;
+	cursor: pointer;
+}
+#current_path {
+	display: none;
+	visibility: hidden;
+}
