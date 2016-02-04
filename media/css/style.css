@@ -135,11 +135,17 @@ nav .brand-logo {
 	float: left;
 }
 .folder:hover,
-.file:hover {
+.file:hover,
+#parent_directory:hover {
 	background-color: #CCCCCC;
 	cursor: pointer;
 }
 #current_path {
 	display: none;
 	visibility: hidden;
+}
+#parent_directory {
+	text-align: center;
+	margin: auto;
+	font-size: 1.5em;
 }
