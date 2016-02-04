@@ -29,7 +29,6 @@ $(document).ready(function () {
                         $('#the_body').append('<div class="row mui-panel " id="loader"><div class="progress"><div class="indeterminate"></div></div></div>');
                         $('#loader').css({'margin-top': '25%'});
                         setTimeout(function () {
-                            console.log(data)
                             $('#loader').remove();
                             folders = '';
                             if (data.folder.length !== 0) {
@@ -58,7 +57,7 @@ $(document).ready(function () {
                                 });
                             }
                             $('#the_body').append('<div class="row mui-panel">There is ' + data.folder.length + ' folder(s) and ' + file_count + ' file(s)</div>');
-                            $('#the_body').append('<div class="row"><div class="mui-panel" id="path_content"><div class="row">' + folders + files + '</div></div></div>');
+                            $('#the_body').append('<div class="row"><div class="col s12" id="parent_directory"><i class="material-icons prefix">reply</i>Parent Directory</div><div class="mui-panel" id="path_content"><div class="row">' + folders + files + '</div></div></div>');
                         }, 1000);
                     }
                 }
@@ -78,6 +77,9 @@ $(document).ready(function () {
     });
     $(document.body).on('click', '.folder', function () {
         send_path($('#current_path').text() + '/' + $(this).children('p').text());
+    });
+    $(document.body).on('click', '#parent_directory', function () {
+        send_path($('#current_path').text().replace(/\/[^\/]+$/, ''));
     });
     $(document.body).on('contextmenu', '.folder', function () {
         console.log('right click on folder');
