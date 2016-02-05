@@ -5,7 +5,8 @@
 Put the project where you want to display  
 
 For now, you can display all folders and the majority of file (hide or not) and the posibility of :  
--listen directly the audio file (im' using the html5 ```<audio>``` element)
+* listen directly the audio file (im' using the html5 ```<audio>``` element)
+* listen directly the video file (im' using the html5 ```<video>``` element and [colorbox plugin](http://www.jacklmoore.com/colorbox/))  
 
 You can take some right to this project if you don't want to have problem :  
 ``` chmod 0744 -R /path/to/display_download ```  
