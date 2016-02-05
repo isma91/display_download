@@ -3,6 +3,9 @@
 /*global $, document, this, Materialize*/
 /* /home/isma91/Téléchargements/ */
 $(document).ready(function () {
+    var extension, parent_directory, array_audio, array_video, extension_video;
+    array_audio = ["mp3", "wav", "wma", "aac"];
+    array_video = ["avi", "ogv", "mpg", "webm", "wmv", "flv", "mkv", "mp4"];
     function get_original_path () {
         "use strict";
         $.post('controllers/get_original_path.php', function (data, textStatus) {
@@ -86,13 +89,34 @@ $(document).ready(function () {
         send_path($('#current_path').text() + '/' + $(this).children('p').text());
     });
     $(document.body).on('click', '#parent_directory', function () {
-        send_path($('#current_path').text().replace(/\/[^\/]+$/, ''));
+        parent_directory = $('#current_path').text().replace(/\/[^\/]+$/, '');
+        if (parent_directory === "") {
+            parent_directory = "/";
+        }
+        send_path(parent_directory);
     });
     $(document.body).on('click', '.file', function () {
-        $('.icons').css('display', 'inline');
-        $('audio').remove();
-        $(this).children('.icons').css('display', 'none');
-        $(this).prepend('<audio controls autoplay><source src="' + $('#current_path').text().replace($('#original_path').text(), "../").replace("//", "/") + "/" + encodeURIComponent($(this).children('p').text()) + '" /></audio>');
+        extension = $(this).children('p').text().split('.').pop();
+        for (i = 0; i < array_audio.length; i = i + 1) {
+            if (extension === array_audio[i]) {
+                $('.icons').css('display', 'inline');
+                $('audio').remove();
+                $(this).children('.icons').css('display', 'none');
+                $(this).prepend('<audio controls autoplay><source src="' + $('#current_path').text().replace($('#original_path').text(), "../").replace("//", "/") + "/" + encodeURIComponent($(this).children('p').text()) + '" /></audio>');
+                break;
+            }
+        }
+        for (j = 0; j < array_video.length; j = j + 1) {
+            if (extension === array_video[j]) {
+                extension_video = extension;
+                if (extension === "ogv") {
+                    extension_video = "ogg";
+                }
+                $('#video').remove();
+                $.colorbox({html:'<h1 id="cboxTitle">Click on the close button at left bottom to close the window</h1><div id="video"><video controls="controls" preload="true"><source src="' + $('#current_path').text().replace($('#original_path').text(), "../").replace("//", "/") + "/" + encodeURIComponent($(this).children('p').text()) + '" type="video/' + extension_video + '" /></video></div>', width:'90%', height: '90%'});
+                break;
+            }
+        }
     });
     $(document.body).on('contextmenu', '.folder', function () {
         console.log('right click on folder');
