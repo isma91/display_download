@@ -3,12 +3,22 @@
 /*global $, document, this, Materialize*/
 /* /home/isma91/Téléchargements/ */
 $(document).ready(function () {
+    function get_original_path () {
+        "use strict";
+        $.post('controllers/get_original_path.php', function (data, textStatus) {
+            if (textStatus === "success") {
+                data = JSON.parse(data);
+                $('#original_path').html(data.original_path);
+                $('#project_path').html(data.project_path);
+            }
+        });
+    }
     function send_path (path) {
         "use strict";
         var breadcrumb, folders, files, file_count;
         file_count = 0;
         if (path !== "") {
-            $.post('controllers/list_file.php', {directory: path}, function (data, textStatus, xhr) {
+            $.post('controllers/list_file.php', {directory: path}, function (data, textStatus) {
                 if (textStatus === "success") {
                     $('#current_path').html(path);
                     $('#the_body').html('<div class="row mui-panel" id="the_menu"></div>');
@@ -66,20 +76,23 @@ $(document).ready(function () {
             Materialize.toast('<p class="alert-failed">Empty path !!<p>', 2000, 'rounded alert-failed');
         }
     }
-    $('#path').keypress(function (event){
-        if(event.keyCode == 13){
-            send_path($('#path').val());
-            event.preventDefault();
-        }
-    });
     $('#send_path').click(function () {
-        send_path($('#path').val());
+        get_original_path();
+        setTimeout(function () {
+            send_path($('#original_path').text());
+        }, 500);
     });
     $(document.body).on('click', '.folder', function () {
         send_path($('#current_path').text() + '/' + $(this).children('p').text());
     });
     $(document.body).on('click', '#parent_directory', function () {
         send_path($('#current_path').text().replace(/\/[^\/]+$/, ''));
+    });
+    $(document.body).on('click', '.file', function () {
+        $('.icons').css('display', 'inline');
+        $('audio').remove();
+        $(this).children('.icons').css('display', 'none');
+        $(this).prepend('<audio controls autoplay><source src="' + $('#current_path').text().replace($('#original_path').text(), "../").replace("//", "/") + "/" + encodeURIComponent($(this).children('p').text()) + '" /></audio>');
     });
     $(document.body).on('contextmenu', '.folder', function () {
         console.log('right click on folder');
