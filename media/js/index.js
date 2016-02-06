@@ -3,9 +3,10 @@
 /*global $, document, this, Materialize*/
 /* /home/isma91/Téléchargements/ */
 $(document).ready(function () {
-    var extension, parent_directory, array_audio, array_video, extension_video;
+    var extension, parent_directory, array_audio, array_video, array_picture, i, j, k;
     array_audio = ["mp3", "wav", "wma", "aac"];
-    array_video = ["avi", "ogv", "mpg", "webm", "wmv", "flv", "mkv", "mp4"];
+    array_video = ["avi", "ogv", "mpg", "webm", "wmv", "flv", "mkv", "mp4", "mov"];
+    array_picture = ["png", "jpg", "bmp"];
     function get_original_path () {
         "use strict";
         $.post('controllers/get_original_path.php', function (data, textStatus) {
@@ -96,7 +97,7 @@ $(document).ready(function () {
         send_path(parent_directory);
     });
     $(document.body).on('click', '.file', function () {
-        extension = $(this).children('p').text().split('.').pop();
+        extension = $(this).children('p').text().split('.').pop().toLowerCase();
         for (i = 0; i < array_audio.length; i = i + 1) {
             if (extension === array_audio[i]) {
                 $('.icons').css('display', 'inline');
@@ -108,12 +109,17 @@ $(document).ready(function () {
         }
         for (j = 0; j < array_video.length; j = j + 1) {
             if (extension === array_video[j]) {
-                extension_video = extension;
-                if (extension === "ogv") {
-                    extension_video = "ogg";
-                }
                 $('#video').remove();
-                $.colorbox({html:'<h1 id="cboxTitle">Click on the close button at left bottom to close the window</h1><div id="video"><video controls="controls" preload="true"><source src="' + $('#current_path').text().replace($('#original_path').text(), "../").replace("//", "/") + "/" + encodeURIComponent($(this).children('p').text()) + '" type="video/' + extension_video + '" /></video></div>', width:'90%', height: '90%'});
+                $('#picture').remove();
+                $.colorbox({html:'<h1 id="cboxTitle">Click on the close button at left bottom to close the window</h1><div id="video"><video controls="controls" preload="true"><source src="' + $('#current_path').text().replace($('#original_path').text(), "../").replace("//", "/") + "/" + encodeURIComponent($(this).children('p').text()) + '" /></video></div>', width:'90%', height: '90%'});
+                break;
+            }
+        }
+        for (k = 0; k < array_picture.length; k = k + 1) {
+            if (extension === array_picture[k]) {
+                $('#video').remove();
+                $('#picture').remove();
+                $.colorbox({hmtl:'<h1 id="cboxTitle">Click on the close button at left bottom to close the window</h1><div id="picture"><img class="responsive-img" src="' + $('#current_path').text().replace($('#original_path').text(), "../").replace("//", "/") + "/" + encodeURIComponent($(this).children('p').text()) + '" alt="' + extension + ' image file" /></div>', width:'90%', height: '90%'});
                 break;
             }
         }
