@@ -114,8 +114,7 @@ audio {
 	width: 100%;
 	background-color: #A8A8A8;
 }
-div#video,
-div#picture {
+div#video {
 	width: 100%;
 	height: 100%;
 }
