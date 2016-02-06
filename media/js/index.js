@@ -110,7 +110,7 @@ $(document).ready(function () {
         for (j = 0; j < array_video.length; j = j + 1) {
             if (extension === array_video[j]) {
                 $('#video').remove();
-                $('#picture').remove();
+                $('.cboxPhoto').remove();
                 $.colorbox({html:'<h1 id="cboxTitle">Click on the close button at left bottom to close the window</h1><div id="video"><video controls="controls" preload="true"><source src="' + $('#current_path').text().replace($('#original_path').text(), "../").replace("//", "/") + "/" + encodeURIComponent($(this).children('p').text()) + '" /></video></div>', width:'90%', height: '90%'});
                 break;
             }
@@ -118,8 +118,8 @@ $(document).ready(function () {
         for (k = 0; k < array_picture.length; k = k + 1) {
             if (extension === array_picture[k]) {
                 $('#video').remove();
-                $('#picture').remove();
-                $.colorbox({hmtl:'<h1 id="cboxTitle">Click on the close button at left bottom to close the window</h1><div id="picture"><img class="responsive-img" src="' + $('#current_path').text().replace($('#original_path').text(), "../").replace("//", "/") + "/" + encodeURIComponent($(this).children('p').text()) + '" alt="' + extension + ' image file" /></div>', width:'90%', height: '90%'});
+                $('.cboxPhoto').remove();
+                $.colorbox({href: $('#current_path').text().replace($('#original_path').text(), "../").replace("//", "/") + "/" + encodeURIComponent($(this).children('p').text()), width:'90%', height: '90%'});
                 break;
             }
         }
