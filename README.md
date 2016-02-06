@@ -4,11 +4,19 @@
   
 Put the project where you want to display  
 
-For now, you can display all folders and the majority of file (hide or not) and the posibility of :  
-* listen directly the audio file (im' using the html5 ```<audio>``` element)
-* listen directly the video file (im' using the html5 ```<video>``` element and [colorbox plugin](http://www.jacklmoore.com/colorbox/))  
+Here are the plugins and libraries that i use :  
+* [muicss](https://www.muicss.com/)
+* [materialize](http://materializecss.com/)
+* [google material icons](https://design.google.com/icons/)
+* [jQuery](https://jquery.com/)
+* [colorbox](http://www.jacklmoore.com/colorbox/)
 
-You can take some right to this project if you don't want to have problem :  
+For now, you can display all folders and the majority of file (hide or not) and the posibility of :  
+* listen directly the audio file
+* listen directly the video file
+* display directly the picture file  
+
+(Optional) You can take some right to this project :  
 ``` chmod 0744 -R /path/to/display_download ```  
 
 You must change the display.prod.conf like this :  
