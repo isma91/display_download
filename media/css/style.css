@@ -20,6 +20,19 @@ html,body {
 	text-align: center;
 	margin: auto;
 }
+.input-field label,
+.input-field .prefix {
+	color: #808080;
+}
+.input-field input[type=text]:focus + label,
+.materialize-textarea:focus + label,
+.input-field .prefix.active {
+	color: #000000;
+}
+.input-field input[type=text]:focus {
+	border-bottom: 1px solid #000000;
+	box-shadow: 0 1px 0 0 #000000;
+}
 .mui-btn--raised:hover,
 .btn:hover {
 	background-color: #D3D3D3;
@@ -158,4 +171,14 @@ video {
 #cboxTitle {
 	margin: auto;
 	text-align: center;
+}
+.context-menu-item:hover {
+	background-color: #999999;
+}
+a {
+	text-decoration: none;
+}
+a:hover,
+a:focus {
+	color: #000000;
 }
