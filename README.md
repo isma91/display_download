@@ -16,7 +16,7 @@ For now, you can display all folders and the majority of file (hide or not) and 
 * listen directly the video file
 * display directly the picture file  
 
-(Optional) Make sure the data path is writeable by the web server to avoid some write problem. For example :
+Make sure the data path is writeable by the web server to avoid some write problem. For example :
 ```chown -R www-data:www-data /path/to/display_download ```
 
 You must change the display.prod.conf like this :  
