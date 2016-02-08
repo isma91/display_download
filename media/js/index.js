@@ -1,12 +1,12 @@
 /*jslint browser: true, node : true*/
 /*jslint devel : true*/
 /*global $, document, this, Materialize*/
-/* /home/isma91/Téléchargements/ */
 $(document).ready(function () {
     var extension, parent_directory, array_audio, array_video, array_picture, i, j, k;
     array_audio = ["mp3", "wav", "wma", "aac"];
     array_video = ["avi", "ogv", "mpg", "webm", "wmv", "flv", "mkv", "mp4", "mov"];
     array_picture = ["png", "jpg", "bmp"];
+    array_code = ["php", "html", "css", "xhtml", "js", "json", "py", "sh", "phar"];
     function get_original_path () {
         "use strict";
         $.post('controllers/get_original_path.php', function (data, textStatus) {
@@ -124,10 +124,60 @@ $(document).ready(function () {
             }
         }
     });
-    $(document.body).on('contextmenu', '.folder', function () {
-        console.log('right click on folder');
-    });
-    $(document.body).on('contextmenu', '.file', function () {
-        console.log('right click on file');
+    $(document.body).on('contextmenu', '.mui-panel', function () {
+        extension = $(this).children('p').text().split('.').pop().toLowerCase();
+        $.contextMenu({
+            selector: '.mui-panel',
+            items: {
+                "Create": {name: "Create Folder", callback: function () {
+                    $('#create_folder_modal').remove();
+                    $('#path_content').append('<div id="create_folder_modal" class="modal modal"><div class="modal-content"><h4>Name of the created folder</h4><div class="row"><div class="input-field"><i class="material-icons prefix">folder_open</i><input id="create_folder_input" type="text"><label for="create_folder_input">Name</label></div></div><div class="modal-footer"><button id="create_folder_button" class="btn modal-action modal-close waves-effect waves-light btn-flat" disabled="true">Create</button><button class="btn modal-action modal-close waves-effect waves-light btn-flat">Quit</button></div></div>');
+                    $('#create_folder_modal').openModal();
+                    $('#create_folder_input').on('change paste keyup', function () {
+                        if ($.trim($(this).val()).match(/\//) !== null || $.trim($(this).val()) === "") {
+                            $("#create_folder_button").attr('disabled', "true");
+                        } else {
+                            $("#create_folder_button").removeAttr('disabled');
+                        }
+                    });
+                    $('#create_folder_button').click(function () {
+                        $.post('controllers/file_system.php', {action: 'create_folder', name: $.trim($('#create_folder_input').val()), from: null, to: $('#current_path').text()}, function (data, textStatus, xhr) {
+                            if (textStatus === "success") {
+                                data = JSON.parse(data);
+                                if (data.error === null) {
+                                    send_path($('#current_path').text());
+                                    Materialize.toast('<p class="alert-success">Folder ' + data.data.folder_name + ' created successfully !!<p>', 1000, 'rounded alert-success');
+                                } else {
+                                    Materialize.toast('<p class="alert-failed">' + data.error + '<p>', 2000, 'rounded alert-failed');
+                                }
+                            }
+                        });
+                    });
+                }},
+                "separator": "---------",
+                "quit": {name: "Quit", callback: $.noop
+            }
+        }});
+        $.contextMenu({
+            selector: '.folder',
+            items: {
+                "copy": {name: "Copy"},
+                "rename": {name: "Rename"},
+                "delete": {name: "Delete"},
+                "separator": "---------",
+                "quit": {name: "Quit", callback: $.noop
+            }
+        }});
+        $.contextMenu({
+            selector: '.file',
+            items: {
+                "edit": {name: "Edit"},
+                "copy": {name: "Copy"},
+                "delete": {name: "Delete"},
+                "properties": {name: "Properties"},
+                "separator": "---------",
+                "quit": {name: "Quit", callback: $.noop
+            }
+        }});
     });
 });
