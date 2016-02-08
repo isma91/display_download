@@ -14,22 +14,28 @@
 */
 function create_folder ($folder_name, $path) {
 	if (!empty($folder_name) && !empty($path)) {
+		$folder_name_path = realpath($path) . "/" . $folder_name;
+		if (!file_exists($folder_name_path)) {
+			if (!mkdir($folder_name_path)) {
+				echo json_encode(array('error' => "The directory " . $folder_name . " can't be created !!", 'data' =>  array('folder_name' => $folder_name)));
+			} else {
+				echo json_encode(array('error' => null, 'data' =>  array('folder_name' => $folder_name)));
+			}
+		} else {
+			echo json_encode(array('error' => "The directory " . $folder_name . " exists !!", 'data' =>  null));
+		}
 	}
 }
 switch ($_POST["action"]) {
 	case 'create_folder':
-		# code...
+	create_folder($_POST["name"], rtrim($_POST["to"], '/') . '/');
 	break;
 	case 'copy':
-		# code...
 	break;
 	case 'delete':
-		# code...
 	break;
 	case 'archive':
-		# code...
 	break;
 	default:
-		# code...
 	break;
 }
