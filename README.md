@@ -16,7 +16,7 @@ For now, you can display all folders and the majority of file (hide or not) and 
 * listen directly the video file
 * display directly the picture file  
 
-Make sure the data path is writeable to avoid some write problem. For example :
+Make sure the data path is writeable to avoid some write problem. For example :  
 ```chmod -R 0777 /path/to/display_download ```  
 
 Or  
