@@ -12,10 +12,13 @@ Here are the plugins and libraries that i use :
 * [colorbox](http://www.jacklmoore.com/colorbox/)
 * [contextMenu](http://swisnl.github.io/jQuery-contextMenu/)
 
-For now, you can display all folders and the majority of file (hide or not) and the posibility of :  
+For now, you can :  
+* display all folders
+* display the majority of file (hide or not)
 * listen directly the audio file
 * listen directly the video file
 * display directly the picture file
+* directly create a folder
 * display directly the properties of a file  
 
 Make sure the data path is writeable to avoid some write problem. For example :  
