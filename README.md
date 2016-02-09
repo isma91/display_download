@@ -10,11 +10,13 @@ Here are the plugins and libraries that i use :
 * [google material icons](https://design.google.com/icons/)
 * [jQuery](https://jquery.com/)
 * [colorbox](http://www.jacklmoore.com/colorbox/)
+* [contextMenu](http://swisnl.github.io/jQuery-contextMenu/)
 
 For now, you can display all folders and the majority of file (hide or not) and the posibility of :  
 * listen directly the audio file
 * listen directly the video file
-* display directly the picture file  
+* display directly the picture file
+* display directly the properties of a file  
 
 Make sure the data path is writeable to avoid some write problem. For example :  
 ```chmod -R 0777 /path/to/display_download ```  
@@ -23,7 +25,7 @@ Or
 
 ```chown -R www-data:www-data /path/to/display_download ```
 
-You must change the display.prod.conf like this :  
+(Optional) You can change the display.prod.conf like this :  
 ```
 DocumentRoot path/to/project/
 <Directory path/to/project/>
