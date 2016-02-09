@@ -33,19 +33,22 @@ function get_stat ($file_name, $path) {
 			if (is_readable($file_name_path)) {
 				$stat = stat($file_name_path);
 				echo json_encode(array(
-					"device_number" => $stat["dev"],
-					"inode_number" => $stat["ino"],
-					"inode_protection_mode" => $stat["mode"],
-					"nb_links" => $stat["nlinks"],
-					"size" => $stat["size"],
-					"user_owner" => posix_getpwuid($stat["uid"]),
-					"gruop_owner" => posix_getgrgid($stat["gid"]),
-					"device_type" => $stat["rdev"],
-					"file_last_access" => date("F d Y H:i:s.", $stat["atime"]),
-					"file_last_modification" => date("F d Y H:i:s.", $stat["mtime"]),
-					"file_last_changing_right" => date("F d Y H:i:s.", $stat["ctime"]),
-					"block_size" => $stat["blksize"],
-					"num_512bits_blick_allowed" => $stat["blocks"],
+					'error' => null,
+					'data' => array(
+						"device number" => $stat["dev"],
+						"inode number" => $stat["ino"],
+						"inode protection mode" => $stat["mode"],
+						"links number" => $stat["nlinks"],
+						"size of the file" => $stat["size"],
+						"user owner" => posix_getpwuid($stat["uid"]),
+						"group owner" => posix_getgrgid($stat["gid"]),
+						"device type" => $stat["rdev"],
+						"last access date" => date("F d Y H:i:s.", $stat["atime"]),
+						"last modification date" => date("F d Y H:i:s.", $stat["mtime"]),
+						"last changing right date" => date("F d Y H:i:s.", $stat["ctime"]),
+						"block size" => $stat["blksize"],
+						"512 bits block allowed" => $stat["blocks"]
+						)
 					)
 				);
 			} else {
