@@ -130,13 +130,12 @@ $(document).ready(function () {
         $.post('controllers/file_system.php', {action: 'properties', name: file_name, from: null, to: path}, function (data, textStatus) {
             if (textStatus === "success") {
                 data = JSON.parse(data);
-                console.log(data);
                 if (data.error === null) {
                     properties = '';
-                    $.each(data, function (name, value) {
+                    $.each(data.data, function (name, value) {
                         properties = properties + '<p>' + name + ' : ' + value + '</p>';
                     });
-                    $('#path_content').append('<div id="get_properties_modal" class="modal"><div class="modal-content"><h1>Properties of ' + file_name + '</h1>' + properties + '</div><div class="modal-footer"><button class="btn modal-action modal-close waves-effect waves-light btn-flat">Quit</button></div></div>');
+                    $('#path_content').append('<div id="get_properties_modal" class="modal"><div class="modal-content"><h2>Properties of ' + file_name + '</h2>' + properties + '</div><div class="modal-footer"><button class="btn modal-action modal-close waves-effect waves-light btn-flat">Quit</button></div></div>');
                     $('#get_properties_modal').openModal();
                 } else {
                     Materialize.toast('<p class="alert-failed">' + data.error + '<p>', 2000, 'rounded alert-failed');
