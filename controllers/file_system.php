@@ -32,6 +32,20 @@ function get_stat ($file_name, $path) {
 		if (file_exists($file_name_path)) {
 			if (is_readable($file_name_path)) {
 				$stat = stat($file_name_path);
+				$size = $stat["size"];
+				if ($size < 1024) {
+					$size = $stat["size"] . ' octets';
+				} elseif ($size > 1024 && $size < 1024000) {
+					$size = ($stat["size"] / 1024) . ' Ko (' . $stat["size"] . ' octets)';
+				} elseif ($size > 1024000 && $size < 1048576000) {
+					$size = ($stat["size"] / 1024 / 1024) . ' Mo (' . $stat["size"] . ' octets)';
+				} elseif ($size > 1048576000 && $size < 1073741824000) {
+					$size = ($stat["size"] / 1024 / 1024 / 1024) . ' Go (' . $stat["size"] . ' octets)';
+				} elseif ($size > 1073741824000 && $size < 1099511627776000) {
+					$size = ($stat["size"] / 1024 / 1024 / 1024 / 1024) . ' To (' . $stat["size"] . ' octets)';
+				} else {
+					$size = ($stat["size"] / 1024 / 1024 / 1024 / 1024 / 1024) . ' Po (' . $stat["size"] . ' octets)';
+				}
 				echo json_encode(array(
 					'error' => null,
 					'data' => array(
@@ -39,7 +53,7 @@ function get_stat ($file_name, $path) {
 						"inode number" => $stat["ino"],
 						"inode protection mode" => $stat["mode"],
 						"links number" => $stat["nlinks"],
-						"size of the file" => $stat["size"],
+						"size of the file" => $size,
 						"user owner" => posix_getpwuid($stat["uid"]),
 						"group owner" => posix_getgrgid($stat["gid"]),
 						"device type" => $stat["rdev"],
