@@ -2,7 +2,7 @@
 /*jslint devel : true*/
 /*global $, document, this, Materialize*/
 $(document).ready(function () {
-    var extension, parent_directory, array_audio, array_video, array_picture, i, j, k;
+    var extension, parent_directory, array_audio, array_video, array_picture, i, j, k, properties;
     array_audio = ["mp3", "wav", "wma", "aac"];
     array_video = ["avi", "ogv", "mpg", "webm", "wmv", "flv", "mkv", "mp4", "mov"];
     array_picture = ["png", "jpg", "bmp"];
@@ -124,6 +124,22 @@ $(document).ready(function () {
             }
         }
     });
+    function send_properties (file_name, path) {
+        "use strict";
+        $('#get_properties_modal').remove();
+        $.post('controllers/file_system.php', {action: 'properties', name: file_name, from: null, to: path}, function (data, textStatus) {
+            if (textStatus === "success") {
+                data = JSON.parse(data);
+                console.log(data);
+                properties = '';
+                $.each(data, function (name, value) {
+                    properties = properties + '<p>' + name + ' : ' + value + '</p>';
+                });
+                $('#path_content').append('<div id="get_properties_modal" class="modal"><div class="modal-content"><h1>Properties of ' + file_name + '</h1>' + properties + '</div><div class="modal-footer"><button class="btn modal-action modal-close waves-effect waves-light btn-flat">Quit</button></div></div>');
+                $('#get_properties_modal').openModal();
+            }
+        });
+    }
     $(document.body).on('contextmenu', '.mui-panel', function () {
         extension = $(this).children('p').text().split('.').pop().toLowerCase();
         $.contextMenu({
@@ -131,7 +147,7 @@ $(document).ready(function () {
             items: {
                 "Create": {name: "Create Folder", callback: function () {
                     $('#create_folder_modal').remove();
-                    $('#path_content').append('<div id="create_folder_modal" class="modal modal"><div class="modal-content"><h4>Name of the created folder</h4><div class="row"><div class="input-field"><i class="material-icons prefix">folder_open</i><input id="create_folder_input" type="text"><label for="create_folder_input">Name</label></div></div><div class="modal-footer"><button id="create_folder_button" class="btn modal-action modal-close waves-effect waves-light btn-flat" disabled="true">Create</button><button class="btn modal-action modal-close waves-effect waves-light btn-flat">Quit</button></div></div>');
+                    $('#path_content').append('<div id="create_folder_modal" class="modal"><div class="modal-content"><h4>Name of the created folder</h4><div class="row"><div class="input-field"><i class="material-icons prefix">folder_open</i><input id="create_folder_input" type="text"><label for="create_folder_input">Name</label></div></div><div class="modal-footer"><button id="create_folder_button" class="btn modal-action modal-close waves-effect waves-light btn-flat" disabled="true">Create</button><button class="btn modal-action modal-close waves-effect waves-light btn-flat">Quit</button></div></div>');
                     $('#create_folder_modal').openModal();
                     $('#create_folder_input').on('change paste keyup', function () {
                         if ($.trim($(this).val()).match(/\//) !== null || $.trim($(this).val()) === "") {
@@ -174,7 +190,9 @@ $(document).ready(function () {
                 "edit": {name: "Edit"},
                 "copy": {name: "Copy"},
                 "delete": {name: "Delete"},
-                "properties": {name: "Properties"},
+                "properties": {name: "Properties", callback: function () {
+                    send_properties($(this).children('p').text(), $('#current_path').text());
+                }},
                 "separator": "---------",
                 "quit": {name: "Quit", callback: $.noop
             }
