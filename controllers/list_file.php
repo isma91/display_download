@@ -15,6 +15,16 @@
 /* take the all path of the directory */
 $directory = rtrim($_POST["directory"], '/') . '/';
 $list_directory = scandir($directory);
+$list_extension = scandir(dirname(__DIR__) . "/media/img/icons/");
+$array_extension = array();
+foreach ($list_extension as $file) {
+	if ($file !== ".." && $file !== ".") {
+		if (is_dir($file)) {
+			continue;
+		}
+		array_push($array_extension, substr($file, 0, -(strlen(pathinfo($file, PATHINFO_EXTENSION)) + 1)));
+	}
+}
 $array_file = array();
 $array_folder = array();
 foreach ($list_directory as $file) {
@@ -22,7 +32,12 @@ foreach ($list_directory as $file) {
 		if (is_dir($directory.$file)) {
 			array_push($array_folder, $file);
 		} else {
-			$array_file[strtolower(pathinfo($file, PATHINFO_EXTENSION))][] = $file;
+			foreach ($array_extension as $extension) {
+				if ($extension === strtolower(pathinfo($file, PATHINFO_EXTENSION))) {
+					$array_file[strtolower(pathinfo($file, PATHINFO_EXTENSION))][] = $file;
+					break;
+				}
+			}
 		}
 	}
 }
