@@ -19,7 +19,8 @@ For now, you can :
 * listen directly the video file
 * display directly the picture file
 * directly create a folder
-* display directly the properties of a file  
+* display directly the properties of a file
+* directly zip a file or a folder  
 
 Make sure the data path is writeable to avoid some write problem. For example :  
 ```chmod -R 0777 /path/to/display_download ```  
