@@ -12,17 +12,20 @@
 * @license  http://opensource.org/licenses/gpl-license.php GNU Public License
 * @link     https://github.com/isma91/display_download/blob/master/controllers/file_system.php
 */
+function send_json ($error, $data) {
+	echo json_encode(array('error' => $error, 'data' => $data));
+}
 function create_folder ($folder_name, $path) {
 	if (!empty($folder_name) && !empty($path)) {
 		$folder_name_path = realpath($path) . "/" . $folder_name;
 		if (!file_exists($folder_name_path)) {
 			if (!mkdir($folder_name_path)) {
-				echo json_encode(array('error' => "The directory " . $folder_name . " can't be created !!", 'data' =>  array('folder_name' => $folder_name)));
+				send_json("The directory " . $folder_name . " can't be created !!", null);
 			} else {
-				echo json_encode(array('error' => null, 'data' =>  array('folder_name' => $folder_name)));
+				send_json(null, array('folder_name' => $folder_name));
 			}
 		} else {
-			echo json_encode(array('error' => "The directory " . $folder_name . " exists !!", 'data' =>  null));
+			send_json("The directory " . $folder_name . " exists !!", null);
 		}
 	}
 }
@@ -46,30 +49,93 @@ function get_stat ($file_name, $path) {
 				} else {
 					$size = ($stat["size"] / 1024 / 1024 / 1024 / 1024 / 1024) . ' Po (' . $stat["size"] . ' octets)';
 				}
-				echo json_encode(array(
-					'error' => null,
-					'data' => array(
-						"device number" => $stat["dev"],
-						"inode number" => $stat["ino"],
-						"inode protection mode" => $stat["mode"],
-						"links number" => $stat["nlinks"],
-						"size of the file" => $size,
-						"user owner" => posix_getpwuid($stat["uid"]),
-						"group owner" => posix_getgrgid($stat["gid"]),
-						"device type" => $stat["rdev"],
-						"last access date" => date("F d Y H:i:s.", $stat["atime"]),
-						"last modification date" => date("F d Y H:i:s.", $stat["mtime"]),
-						"last changing right date" => date("F d Y H:i:s.", $stat["ctime"]),
-						"block size" => $stat["blksize"],
-						"512 bits block allowed" => $stat["blocks"]
-						)
+				send_json(null, array(
+					"device number" => $stat["dev"],
+					"inode number" => $stat["ino"],
+					"inode protection mode" => $stat["mode"],
+					"links number" => $stat["nlinks"],
+					"size of the file" => $size,
+					"user owner" => posix_getpwuid($stat["uid"]),
+					"group owner" => posix_getgrgid($stat["gid"]),
+					"device type" => $stat["rdev"],
+					"last access date" => date("F d Y H:i:s.", $stat["atime"]),
+					"last modification date" => date("F d Y H:i:s.", $stat["mtime"]),
+					"last changing right date" => date("F d Y H:i:s.", $stat["ctime"]),
+					"block size" => $stat["blksize"],
+					"512 bits block allowed" => $stat["blocks"]
 					)
 				);
 			} else {
-				echo json_encode(array('error' => "The file " . $file_name . "  can't be readable !! Check this project right !!", 'data' =>  null));
+				send_json("The file " . $file_name . "  can't be readable !! Check this project right !!", null);
 			}
 		} else {
-			echo json_encode(array('error' => "The file " . $file_name . "  don't exists !!", 'data' =>  null));
+			send_json("The file " . $file_name . "  don't exists !!", null);
+		}
+	}
+}
+function create_archive ($archive_name, $path, $extension, $files) {
+	if (!empty($archive_name) && !empty($path) && !empty($extension) && !empty($files)) {
+		$accepted_extension = false;
+		$array_files = array();
+		$array_path_files = array();
+		$array_path_folders = array();
+		$array_all = array();
+		$array_extension = array(".zip", ".tar", ".tar.gz", ".tar.bz2");
+		foreach ($array_extension as $archive_extension) {
+			if ($archive_extension === $extension) {
+				$accepted_extension = true;
+				break;
+			}
+		}
+		if ($accepted_extension === false) {
+			send_json("Archive extension is not supported !!", null);
+		}
+		//$compression_id = sha1(rand());
+		//$progress_file_compression = file_put_contents($compression_id, "");
+		$max_size = 4294967296;
+		foreach ($files as $file) {
+			if (is_file($path . $file)) {
+				if (filesize($path . $file) > $max_size || filesize($path . $file) < 1) {
+				} else {
+					array_push($array_path_files, $path . $file);
+					array_push($array_files, substr($path . $file, strlen($path)));
+				}
+			} else {
+				array_push($array_path_folders, $path . $file);
+			}
+		}
+		foreach ($array_path_folders as $folder) {
+			$list_folder = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($folder));
+			foreach ($list_folder as $file_in_folder) {
+				if ($file_in_folder->isDir()) {
+					continue;
+				}
+				array_push($array_path_files, $file_in_folder->getPathname());
+				array_push($array_files, substr($file_in_folder->getPathname(), strlen($path)));
+			}
+		}
+		if ($extension === ".zip") {
+			$tmp_zip = tempnam("tmp", "zip");
+			$zip = new ZipArchive();
+			$create_zip = $zip->open($tmp_zip, ZipArchive::OVERWRITE);
+			$array_all = array_combine($array_path_files, $array_files);
+			if ($create_zip === true) {
+				foreach ($array_all as $full_path => $file_name) {
+					if (file_exists($full_path)) {
+						if (is_readable($full_path)) {
+							$zip->addFile($full_path, $file_name);
+						}
+					}
+				}
+				$zip->close();
+				rename($tmp_zip, $path . $archive_name . $extension);
+				send_json(null, null);
+			} else {
+				send_json("Can't create zip archive !!", null);
+			}
+
+			//unlink("/tmp/" . $archive_name . $extension);
+		} else {
 		}
 	}
 }
@@ -81,7 +147,8 @@ switch ($_POST["action"]) {
 	break;
 	case 'delete':
 	break;
-	case 'archive':
+	case 'create_archive':
+	create_archive($_POST["archive_name"], rtrim($_POST["to"], '/') . '/', $_POST["extension"], $_POST["files"]);
 	break;
 	case 'properties':
 	get_stat($_POST["name"], rtrim($_POST["to"], '/') . '/');
