@@ -56,6 +56,12 @@ html,body {
 	text-align: center;
 	background-color: red;
 }
+.alert-info {
+	width: 100%;
+	margin: auto;
+	text-align: center;
+	background-color: #00CCFF;
+}
 .incomplete {
 	color: red;
 }
@@ -193,3 +199,33 @@ a:focus {
 	color: red;
 	font-size: 1.5em;
 }
+/* begin loader css */
+.loader {
+    border: 5px solid #333;
+    border-radius: 30px;
+    height: 30px;
+    left: 50%;
+    margin: -15px 0 0 -15px;
+    opacity: 0;
+    position: absolute;
+    top: 50%;
+    width: 30px;
+ 
+    animation: pulsate 1s ease-out;
+    animation-iteration-count: infinite;
+}
+
+@keyframes pulsate {
+    0% {
+      transform: scale(.1);
+      opacity: 0.0;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1.2);
+      opacity: 0;
+    }
+}
+/* end loader css */
