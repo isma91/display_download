@@ -90,8 +90,6 @@ function create_archive ($archive_name, $path, $extension, $files) {
 		if ($accepted_extension === false) {
 			send_json("Archive extension is not supported !!", null);
 		}
-		//$compression_id = sha1(rand());
-		//$progress_file_compression = file_put_contents($compression_id, "");
 		$max_size = 4294967296;
 		foreach ($files as $file) {
 			if (is_file($path . $file)) {
@@ -128,13 +126,12 @@ function create_archive ($archive_name, $path, $extension, $files) {
 					}
 				}
 				$zip->close();
-				rename($tmp_zip, $path . $archive_name . $extension);
 				send_json(null, null);
+				rename($tmp_zip, $path . $archive_name . $extension);
 			} else {
+				unlink($tmp_zip);
 				send_json("Can't create zip archive !!", null);
 			}
-
-			//unlink("/tmp/" . $archive_name . $extension);
 		} else {
 		}
 	}
