@@ -182,3 +182,14 @@ a:hover,
 a:focus {
 	color: #000000;
 }
+[type="radio"].with-gap:checked+label:before {
+	border: 2px solid #999999;
+}
+[type="radio"].with-gap:checked+label:after {
+	border: 2px solid #999999;
+	background-color: #999999;
+}
+.error {
+	color: red;
+	font-size: 1.5em;
+}
