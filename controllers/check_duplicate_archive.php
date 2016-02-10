@@ -12,5 +12,5 @@
 * @license  http://opensource.org/licenses/gpl-license.php GNU Public License
 * @link     https://github.com/isma91/display_download/blob/master/controllers/list_file.php
 */
-$archive_path = realpath(rtrim($_POST["path"], "/") . "/" . $_POST["archive_name"] . $_POST["extension"]);
+$archive_path = rtrim(realpath($_POST["path"]), "/") . "/" . $_POST["archive_name"] . $_POST["extension"];
 echo json_encode(array('file_exists' => file_exists($archive_path)));
