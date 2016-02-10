@@ -108,6 +108,7 @@ $(document).ready(function () {
                     $('#create_archive_div').html('<p class="error">Archive name already taken !!</p>');
                     $("#create_archive_button").attr('disabled', "true");
                 } else {
+                    $('#create_archive_div').html('<p class="error"></p>');
                     $("#create_archive_button").removeAttr('disabled');
                 }
             }
@@ -217,12 +218,13 @@ $(document).ready(function () {
                     file = $(this).children('p').text();
                     send_archive();
                     $('#create_archive_button').click(function() {
+                        $('#path_content').append('<div class="loader"></div>');
                         $.post('controllers/file_system.php', {action: 'create_archive', files: [file], archive_name: $.trim($('#create_archive_input').val()), from: null, to: $('#current_path').text(), extension: $("input[name=archive_extension]:checked").val()}, function (data, textStatus) {
                             if (textStatus === "success") {
                                 data = JSON.parse(data);
                                 if (data.error === null) {
                                     send_path($('#current_path').text());
-                                    Materialize.toast('<p class="alert-success">Archive ' + archive_name + extension + ' created successfully !!<p>', 1000, 'rounded alert-success');
+                                    Materialize.toast('<p class="alert-success">Archive ' + $.trim($('#create_archive_input').val()) + $("input[name=archive_extension]:checked").val() + ' created successfully !!<p>', 3000, 'rounded alert-success');
                                 } else {
                                     Materialize.toast('<p class="alert-failed">' + data.error + '<p>', 2000, 'rounded alert-failed');
                                 }
@@ -244,12 +246,13 @@ $(document).ready(function () {
                     file = $(this).children('p').text();
                     send_archive();
                     $('#create_archive_button').click(function() {
+                        $('#path_content').append('<div class="loader"></div>');
                         $.post('controllers/file_system.php', {action: 'create_archive', files: [file], archive_name: $.trim($('#create_archive_input').val()), from: null, to: $('#current_path').text(), extension: $("input[name=archive_extension]:checked").val()}, function (data, textStatus) {
                             if (textStatus === "success") {
                                 data = JSON.parse(data);
                                 if (data.error === null) {
                                     send_path($('#current_path').text());
-                                    Materialize.toast('<p class="alert-success">Archive ' + archive_name + extension + ' created successfully !!<p>', 1000, 'rounded alert-success');
+                                    Materialize.toast('<p class="alert-success">Archive ' + $.trim($('#create_archive_input').val()) + $("input[name=archive_extension]:checked").val() + ' created successfully !!<p>', 3000, 'rounded alert-success');
                                 } else {
                                     Materialize.toast('<p class="alert-failed">' + data.error + '<p>', 2000, 'rounded alert-failed');
                                 }
