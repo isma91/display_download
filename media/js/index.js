@@ -130,6 +130,14 @@ $(document).ready(function () {
             }
         });
     }
+    function display_pdf (url_pdf) {
+        "use strict";
+        var pdf;
+        $('#pdf_modal').remove();
+        $('#path_content').append('<div id="pdf_modal" class="modal modal-fixed-footer"><div class="modal-content" id="pdf_view"></div><div class="modal-footer"><button class="btn modal-action modal-close waves-effect waves-light btn-flat">Quit</button></div></div>');
+        pdf = new PDFObject({url: url_pdf, pdfOpenParams: { scrollbars: '1', toolbar: '1', statusbar: '1', messages: '1', navpanes: '1' }}).embed('pdf_view');
+        $('#pdf_modal').openModal();
+    }
     $('#send_path').click(function () {
         get_original_path();
         setTimeout(function () {
@@ -172,6 +180,9 @@ $(document).ready(function () {
                 $.colorbox({href: $('#current_path').text().replace($('#original_path').text(), "../").replace("//", "/") + "/" + encodeURIComponent($(this).children('p').text()), width:'90%', height: '90%'});
                 break;
             }
+        }
+        if (extension === "pdf") {
+            display_pdf($('#current_path').text().replace($('#original_path').text(), "../").replace("//", "/") + "/" + encodeURIComponent($(this).children('p').text()));
         }
     });
     $(document.body).on('contextmenu', '.mui-panel', function () {
