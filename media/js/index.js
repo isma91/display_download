@@ -236,8 +236,10 @@ $(document).ready(function () {
                                 if (data.error === null) {
                                     send_path($('#current_path').text());
                                     Materialize.toast('<p class="alert-success">Archive ' + $.trim($('#create_archive_input').val()) + $("input[name=archive_extension]:checked").val() + ' created successfully !!<p>', 3000, 'rounded alert-success');
+                                    $('.loader').remove();
                                 } else {
                                     Materialize.toast('<p class="alert-failed">' + data.error + '<p>', 2000, 'rounded alert-failed');
+                                    $('.loader').remove();
                                 }
                             }
                         });
@@ -264,8 +266,10 @@ $(document).ready(function () {
                                 if (data.error === null) {
                                     send_path($('#current_path').text());
                                     Materialize.toast('<p class="alert-success">Archive ' + $.trim($('#create_archive_input').val()) + $("input[name=archive_extension]:checked").val() + ' created successfully !!<p>', 3000, 'rounded alert-success');
+                                    $('.loader').remove();
                                 } else {
                                     Materialize.toast('<p class="alert-failed">' + data.error + '<p>', 2000, 'rounded alert-failed');
+                                    $('.loader').remove();
                                 }
                             }
                         });
