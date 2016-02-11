@@ -112,28 +112,41 @@ function create_archive ($archive_name, $path, $extension, $files) {
 				array_push($array_files, substr($file_in_folder->getPathname(), strlen($path)));
 			}
 		}
+		$array_all = array_combine($array_path_files, $array_files);
 		if ($extension === ".zip") {
-			$tmp_zip = tempnam("tmp", "zip");
-			$zip = new ZipArchive();
-			$create_zip = $zip->open($tmp_zip, ZipArchive::OVERWRITE);
-			$array_all = array_combine($array_path_files, $array_files);
-			if ($create_zip === true) {
-				foreach ($array_all as $full_path => $file_name) {
-					if (file_exists($full_path)) {
-						if (is_readable($full_path)) {
-							$zip->addFile($full_path, $file_name);
-						}
-					}
-				}
-				$zip->close();
-				send_json(null, null);
-				rename($tmp_zip, $path . $archive_name . $extension);
-			} else {
-				unlink($tmp_zip);
+			$tmp_archive = tempnam("tmp", "zip");
+			$archive = new ZipArchive();
+			$create_archive = $archive->open($tmp_archive, ZipArchive::OVERWRITE);
+			if ($create_archive !== true) {
+				unlink($tmp_archive);
 				send_json("Can't create zip archive !!", null);
+				throw new Exception("Can't create zip archive !!");
 			}
 		} else {
+			$tmp_archive = tempnam("tmp", "tar") . ".tar";
+			$archive = new PharData($tmp_archive);
 		}
+		foreach ($array_all as $full_path => $file_name) {
+			if (file_exists($full_path)) {
+				if (is_readable($full_path)) {
+					$archive->addFile($full_path, $file_name);
+				}
+			}
+		}
+		if ($extension === ".zip") {
+			$archive->close();
+		} elseif ($extension !== ".tar") {
+			$archive_type_compress = substr($extension, 1);
+			if ($archive_type_compress == "gz") {
+				$archive->compress(Phar::GZ);
+				$extension = ".tar.gz";
+			} elseif ($archive_type_compress == "bz2") {
+				$archive->compress(Phar::BZ2);
+				$extension = ".tar.bz2";
+			}
+		}
+		send_json(null, null);
+		rename($tmp_archive, $path . $archive_name . $extension);
 	}
 }
 switch ($_POST["action"]) {
