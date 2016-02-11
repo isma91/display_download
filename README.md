@@ -11,6 +11,7 @@ Here are the plugins and libraries that i use :
 * [jQuery](https://jquery.com/)
 * [colorbox](http://www.jacklmoore.com/colorbox/)
 * [contextMenu](http://swisnl.github.io/jQuery-contextMenu/)
+* [PDFObject](http://pdfobject.com/)
 
 For now, you can :  
 * display all folders
@@ -20,7 +21,8 @@ For now, you can :
 * display directly the picture file
 * directly create a folder
 * display directly the properties of a file
-* directly zip a file or a folder  
+* directly zip a file or a folder
+* display directly a pdf  
 
 Make sure the data path is writeable to avoid some write problem. For example :  
 ```chmod -R 0777 /path/to/display_download ```  
