@@ -21,7 +21,7 @@ For now, you can :
 * display directly the picture file
 * directly create a folder
 * display directly the properties of a file
-* directly zip a file or a folder
+* directly zip, tar, tar.gz or tar.bz2 a file or a folder
 * display directly a pdf  
 
 Make sure the data path is writeable to avoid some write problem. For example :  
