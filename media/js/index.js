@@ -175,10 +175,9 @@ $(document).ready(function () {
         extension = $(this).children('p').text().split('.').pop().toLowerCase();
         for (i = 0; i < array_audio.length; i = i + 1) {
             if (extension === array_audio[i]) {
-                $('.icons').css('display', 'inline');
+                $('#audio').remove();
                 $('audio').remove();
-                $(this).children('.icons').css('display', 'none');
-                $(this).prepend('<audio controls autoplay><source src="' + $('#current_path').text().replace($('#original_path').text(), "../").replace("//", "/") + "/" + encodeURIComponent($(this).children('p').text()) + '" /></audio>');
+                $.colorbox({html:'<h1 id="cboxTitle">Click on the close button at left bottom to close the window</h1><div id="audio"><audio controls autoplay><source src="' + $('#current_path').text().replace($('#original_path').text(), "../").replace("//", "/") + "/" + encodeURIComponent($(this).children('p').text()) + '" /></audio></div>', width:'90%', height: '90%'});
                 break;
             }
         }
