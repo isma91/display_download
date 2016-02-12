@@ -22,7 +22,23 @@ For now, you can :
 * directly create a folder
 * display directly the properties of a file
 * directly zip, tar, tar.gz or tar.bz2 a file or a folder
+* directly exract zip, tar, tar.gz, tar.bz2 or rar archive
 * display directly a pdf  
+
+If you want to use rar and zip feature, you must install rar and zip library :  
+```
+sudo pecl -v install rar
+sudo pecl -v install zip
+```
+
+After that you must add in your php.ini :  
+```
+extension = rar.so
+extension = zip.so
+```
+
+And restart apache2 with :  
+```sudo service apache2 restart```
 
 Make sure the data path is writeable to avoid some write problem. For example :  
 ```chmod -R 0777 /path/to/display_download ```  
