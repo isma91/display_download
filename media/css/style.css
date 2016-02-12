@@ -3,11 +3,16 @@
 	font-style: normal;
 	src: url('../font/Pacifico.ttf');
 }
+@font-face {
+	font-family: 'Abel-Regular';
+	font-style: normal;
+	src: url('../font/Abel-Regular.ttf');
+}
 html,body {
 	height:100%;
 	margin: 0px;
 	padding: 0px;
-	font-family: 'Abel', sans-serif;
+	font-family: 'Abel-Regular', sans-serif;
 }
 #title {
 	text-align: center;
@@ -25,11 +30,14 @@ html,body {
 	color: #808080;
 }
 .input-field input[type=text]:focus + label,
+.input-field input[type=password]:focus + label,
+.input-field input[type=password]:focus + label,
 .materialize-textarea:focus + label,
 .input-field .prefix.active {
 	color: #000000;
 }
-.input-field input[type=text]:focus {
+.input-field input[type=text]:focus,
+.input-field input[type=password]:focus {
 	border-bottom: 1px solid #000000;
 	box-shadow: 0 1px 0 0 #000000;
 }
@@ -202,31 +210,34 @@ a:focus {
 }
 /* begin loader css */
 .loader {
-    border: 5px solid #333;
-    border-radius: 30px;
-    height: 30px;
-    left: 50%;
-    margin: -15px 0 0 -15px;
-    opacity: 0;
-    position: absolute;
-    top: 50%;
-    width: 30px;
- 
-    animation: pulsate 1s ease-out;
-    animation-iteration-count: infinite;
+	border: 5px solid #333;
+	border-radius: 30px;
+	height: 30px;
+	left: 50%;
+	margin: -15px 0 0 -15px;
+	opacity: 0;
+	position: absolute;
+	top: 50%;
+	width: 30px;
+
+	animation: pulsate 1s ease-out;
+	animation-iteration-count: infinite;
 }
 
 @keyframes pulsate {
-    0% {
-      transform: scale(.1);
-      opacity: 0.0;
-    }
-    50% {
-      opacity: 1;
-    }
-    100% {
-      transform: scale(1.2);
-      opacity: 0;
-    }
+	0% {
+		transform: scale(.1);
+		opacity: 0.0;
+	}
+	50% {
+		opacity: 1;
+	}
+	100% {
+		transform: scale(1.2);
+		opacity: 0;
+	}
 }
 /* end loader css */
+#refresh {
+	cursor: pointer;
+}
