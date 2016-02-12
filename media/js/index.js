@@ -101,7 +101,7 @@ $(document).ready(function () {
     }
     function check_duplicate_archive (archive_name, path, extension) {
         "use strict";
-        $.post('controllers/check_duplicate_archive.php', {archive_name: archive_name, path: path, extension: extension}, function (data, textStatus) {
+        $.post('controllers/check_duplicate_file.php', {file_type: "archive", archive_name: archive_name, path: path, extension: extension}, function (data, textStatus) {
             if (textStatus === "success") {
                 data = JSON.parse(data);
                 if (data.file_exists === true) {
@@ -154,6 +154,47 @@ $(document).ready(function () {
         $('#path_content').append('<div id="pdf_modal" class="modal modal-fixed-footer"><div class="modal-content" id="pdf_view"></div><div class="modal-footer"><button class="btn modal-action modal-close waves-effect waves-light btn-flat">Quit</button></div></div>');
         pdf = new PDFObject({url: url_pdf, pdfOpenParams: { scrollbars: '1', toolbar: '1', statusbar: '1', messages: '1', navpanes: '1' }}).embed('pdf_view');
         $('#pdf_modal').openModal();
+    }
+    function check_duplicate_file(file_name) {
+        "use strict";
+        $.post('controllers/check_duplicate_file.php', {file_type: 'file', path: $('#current_path').text(), file_name: file_name}, function (data, textStatus) {
+            if (textStatus === "success") {
+                data = JSON.parse(data);
+                if (data.file_exists === true) {
+                    $('#check_new_name').html('<p class="error">Name already taken !!</p>');
+                    $("#rename_button").attr('disabled', "true");
+                } else {
+                    $('#check_new_name').html('<p class="error"></p>');
+                    $("#rename_button").removeAttr('disabled');
+                }
+            }
+        });
+    }
+    function send_rename (old_name) {
+        "use strict";
+        $('#rename_modal').remove();
+        $('#path_content').append('<div id="rename_modal" class="modal"><div class="modal-content"><div class="row"><div id="check_new_name"></div><div class="input-field"><i class="material-icons prefix">fiber_new</i><input id="rename_input" type="text"><label for="rename_input">New name</label></div></div></div><div class="modal-footer"><button id="rename_button" class="btn modal-action modal-close waves-effect waves-light btn-flat" disabled="true">Rename</button><button class="btn modal-action modal-close waves-effect waves-light btn-flat">Quit</button></div></div>');
+        $('#rename_modal').openModal();
+        $("#rename_input").on('change paste keyup', function () {
+            if ($.trim($(this).val()).match(/\//) !== null || $.trim($(this).val()) === "") {
+                $("#rename_button").attr('disabled', "true");
+            } else {
+                check_duplicate_file($.trim($(this).val()), $('#current_path').text());
+            }
+        });
+        $('#rename_button').click(function () {
+            $.post('controllers/file_system.php', {action: 'rename', old_name: old_name, new_name: $.trim($('#rename_input').val()), from: null, to: $('#current_path').text()}, function (data, textStatus) {
+                if (textStatus === "success") {
+                    data = JSON.parse(data);
+                    if (data.error === null) {
+                        send_path($('#current_path').text());
+                        Materialize.toast('<p class="alert-success">' + old_name + ' rename in ' + data.data + ' successfully !!<p>', 3000, 'rounded alert-success');
+                    } else {
+                        Materialize.toast('<p class="alert-failed">' + data.error + '<p>', 3000, 'rounded alert-failed');
+                    }
+                }
+            });
+        });
     }
     $('#send_path').click(function () {
         get_original_path();
@@ -239,7 +280,9 @@ $(document).ready(function () {
             selector: '.folder',
             items: {
                 "copy": {name: "Copy"},
-                "rename": {name: "Rename"},
+                "rename": {name: "Rename", callback: function () {
+                    send_rename($(this).children('p').text());
+                }},
                 "delete": {name: "Delete"},
                 "archive": {name: "Archive", callback: function () {
                     file = $(this).children('p').text();
@@ -258,6 +301,9 @@ $(document).ready(function () {
                 "edit": {name: "Edit"},
                 "copy": {name: "Copy"},
                 "delete": {name: "Delete"},
+                "rename": {name: "Rename", callback: function () {
+                    send_rename($(this).children('p').text());
+                }},
                 "archive": {name: "Archive", callback: function () {
                     file = $(this).children('p').text();
                     send_archive();
