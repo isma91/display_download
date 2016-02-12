@@ -260,11 +260,42 @@ function extract_archive ($archive_name, $path, $password) {
 		send_json(null, $only_file_name);
 	}
 }
+function rename_file($old_name, $new_name, $path) {
+	if (!empty($old_name) && !empty($new_name) && !empty($path)) {
+		if (file_exists($path . $old_name)) {
+			if (!file_exists($path . $new_name)) {
+				try {
+					$extension = "";
+					if (is_file($path . $old_name)) {
+						$extension = "." . pathinfo($path . $old_name, PATHINFO_EXTENSION);
+						if ($extension === ".gz" || $extension === ".bz2") {
+							$extension = ".tar" . $extension;
+						}
+					}
+					rename($path . $old_name, $path . $new_name . $extension);
+					send_json(null, $new_name . $extension);
+				} catch (Exception $e) {
+					send_json($e->getMessage(), null);
+					throw new Exception($e->getMessage());
+				}
+			} else {
+				send_json("File " . $new_name . " already exist !!", null);
+				throw new Exception("File " . $new_name . " already exist !!");
+			}
+		} else {
+			send_json("File not found !!", null);
+			throw new Exception("File not found !!");
+		}
+	}
+}
 switch ($_POST["action"]) {
 	case 'create_folder':
 	create_folder($_POST["name"], rtrim($_POST["to"], '/') . '/');
 	break;
 	case 'copy':
+	break;
+	case 'rename':
+	rename_file($_POST["old_name"], $_POST["new_name"], rtrim($_POST["to"], "/") . '/');
 	break;
 	case 'delete':
 	break;
