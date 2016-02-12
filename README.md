@@ -23,7 +23,8 @@ For now, you can :
 * display directly the properties of a file
 * directly zip, tar, tar.gz or tar.bz2 a file or a folder
 * directly exract zip, tar, tar.gz, tar.bz2 or rar archive
-* display directly a pdf  
+* display directly a pdf
+* display rename a folder or a file  
 
 If you want to use rar and zip feature, you must install rar and zip library :  
 ```
