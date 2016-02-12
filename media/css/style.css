@@ -142,7 +142,8 @@ audio {
 	background-color: #A8A8A8;
 }
 div#video,
-div#pdf_modal {
+div#pdf_modal,
+div#audio {
 	width: 100%;
 	height: 100%;
 }
