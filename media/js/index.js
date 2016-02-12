@@ -2,7 +2,7 @@
 /*jslint devel : true*/
 /*global $, document, this, Materialize*/
 $(document).ready(function () {
-    var extension, parent_directory, array_audio, array_video, array_picture, i, j, k, properties, file;
+    var extension, parent_directory, array_audio, array_video, array_picture, i, j, k, properties, file, archive_name;
     array_audio = ["mp3", "wav", "wma", "aac"];
     array_video = ["avi", "ogv", "mpg", "webm", "wmv", "flv", "mkv", "mp4", "mov"];
     array_picture = ["png", "jpg", "bmp"];
@@ -28,7 +28,7 @@ $(document).ready(function () {
                     $('#the_body').html('<div class="row mui-panel" id="the_menu"></div>');
                     data = JSON.parse(data);
                     if (data.folder.length === 0 && data.file.length === 0) {
-                        Materialize.toast('<p class="alert-failed">No folder or file here !!<p>', 2000, 'rounded alert-failed');
+                        Materialize.toast('<p class="alert-failed">No folder or file here !!<p>', 3000, 'rounded alert-failed');
                     } else {
                         $('#absolute_center_form').remove();
                         breadcrumb = '<a href="#" class="breadcrumb">/</a>';
@@ -39,7 +39,7 @@ $(document).ready(function () {
                                 }
                             });
                         }
-                        $('#the_menu').html(' <nav><div class="nav-wrapper"><a href="#" class="brand-logo">Display_Download</a><div class="right" id="menu_current_path">' + breadcrumb + '</div></div></nav>');
+                        $('#the_menu').html(' <nav><div class="nav-wrapper"><a href="#" class="brand-logo">Display_Download</a><i class="right medium material-icons" id="refresh">refresh</i><div class="right" id="menu_current_path">' + breadcrumb + '</div></div></nav>');
                         $('#the_body').append('<div class="row mui-panel " id="loader"><div class="progress"><div class="indeterminate"></div></div></div>');
                         $('#loader').css({'margin-top': '25%'});
                         setTimeout(function () {
@@ -77,7 +77,7 @@ $(document).ready(function () {
                 }
             });
         } else {
-            Materialize.toast('<p class="alert-failed">Empty path !!<p>', 2000, 'rounded alert-failed');
+            Materialize.toast('<p class="alert-failed">Empty path !!<p>', 3000, 'rounded alert-failed');
         }
     }
     function send_properties (file_name, path) {
@@ -94,7 +94,7 @@ $(document).ready(function () {
                     $('#path_content').append('<div id="get_properties_modal" class="modal"><div class="modal-content"><h2>Properties of ' + file_name + '</h2>' + properties + '</div><div class="modal-footer"><button class="btn modal-action modal-close waves-effect waves-light btn-flat">Quit</button></div></div>');
                     $('#get_properties_modal').openModal();
                 } else {
-                    Materialize.toast('<p class="alert-failed">' + data.error + '<p>', 2000, 'rounded alert-failed');
+                    Materialize.toast('<p class="alert-failed">' + data.error + '<p>', 3000, 'rounded alert-failed');
                 }
             }
         });
@@ -127,6 +127,23 @@ $(document).ready(function () {
                 $("#create_archive_button").attr('disabled', "true");
             } else {
                 check_duplicate_archive($.trim($(this).val()), $('#current_path').text(), $("input[name=archive_extension]:checked").val());
+            }
+        });
+    }
+    function send_create_archive () {
+        "use strict";
+        $('#path_content').append('<div class="loader"></div>');
+        $.post('controllers/file_system.php', {action: 'create_archive', files: [file], archive_name: $.trim($('#create_archive_input').val()), from: null, to: $('#current_path').text(), extension: $("input[name=archive_extension]:checked").val()}, function (data, textStatus) {
+            if (textStatus === "success") {
+                data = JSON.parse(data);
+                if (data.error === null) {
+                    send_path($('#current_path').text());
+                    Materialize.toast('<p class="alert-success">Archive ' + $.trim($('#create_archive_input').val()) + $("input[name=archive_extension]:checked").val() + ' created successfully !!<p>', 3000, 'rounded alert-success');
+                    $('.loader').remove();
+                } else {
+                    Materialize.toast('<p class="alert-failed">' + data.error + '<p>', 3000, 'rounded alert-failed');
+                    $('.loader').remove();
+                }
             }
         });
     }
@@ -209,7 +226,7 @@ $(document).ready(function () {
                                     send_path($('#current_path').text());
                                     Materialize.toast('<p class="alert-success">Folder ' + data.data.folder_name + ' created successfully !!<p>', 1000, 'rounded alert-success');
                                 } else {
-                                    Materialize.toast('<p class="alert-failed">' + data.error + '<p>', 2000, 'rounded alert-failed');
+                                    Materialize.toast('<p class="alert-failed">' + data.error + '<p>', 3000, 'rounded alert-failed');
                                 }
                             }
                         });
@@ -229,20 +246,7 @@ $(document).ready(function () {
                     file = $(this).children('p').text();
                     send_archive();
                     $('#create_archive_button').click(function() {
-                        $('#path_content').append('<div class="loader"></div>');
-                        $.post('controllers/file_system.php', {action: 'create_archive', files: [file], archive_name: $.trim($('#create_archive_input').val()), from: null, to: $('#current_path').text(), extension: $("input[name=archive_extension]:checked").val()}, function (data, textStatus) {
-                            if (textStatus === "success") {
-                                data = JSON.parse(data);
-                                if (data.error === null) {
-                                    send_path($('#current_path').text());
-                                    Materialize.toast('<p class="alert-success">Archive ' + $.trim($('#create_archive_input').val()) + $("input[name=archive_extension]:checked").val() + ' created successfully !!<p>', 3000, 'rounded alert-success');
-                                    $('.loader').remove();
-                                } else {
-                                    Materialize.toast('<p class="alert-failed">' + data.error + '<p>', 2000, 'rounded alert-failed');
-                                    $('.loader').remove();
-                                }
-                            }
-                        });
+                        send_create_archive();
                     });
                 }},
                 "separator": "---------",
@@ -259,17 +263,24 @@ $(document).ready(function () {
                     file = $(this).children('p').text();
                     send_archive();
                     $('#create_archive_button').click(function() {
-                        $('#path_content').append('<div class="loader"></div>');
-                        $.post('controllers/file_system.php', {action: 'create_archive', files: [file], archive_name: $.trim($('#create_archive_input').val()), from: null, to: $('#current_path').text(), extension: $("input[name=archive_extension]:checked").val()}, function (data, textStatus) {
+                        send_create_archive();
+                    });
+                }},
+                "extract": {name: "Extract archive here", callback: function () {
+                    archive_name = $(this).children('p').text();
+                    $('#archive_get_password_modal').remove();
+                    $('#path_content').append('<div id="archive_get_password_modal" class="modal"><div class="modal-content"><h4>If your rar archive have a password, please enter here and click to the extract button, if not just click to extract button</h4><div class="row"><div class="input-field"><i class="material-icons prefix">archive</i><input id="archive_password" type="password"><label for="archive_password">Archive Password</label></div></div></div><div class="modal-footer"><button id="archive_password_button" class="btn modal-action modal-close waves-effect waves-light btn-flat">Extract</button><button class="btn modal-action modal-close waves-effect waves-light btn-flat">Quit</button></div></div>');
+                    $('#archive_get_password_modal').openModal();
+                    $('#archive_password_button').click(function () {
+                        $.post('controllers/file_system.php', {action: 'extract_archive', archive_name: archive_name, archive_password: $('#archive_password').val(), from: null, to: $('#current_path').text()}, function (data, textStatus) {
                             if (textStatus === "success") {
                                 data = JSON.parse(data);
+                                console.log(data);
                                 if (data.error === null) {
                                     send_path($('#current_path').text());
-                                    Materialize.toast('<p class="alert-success">Archive ' + $.trim($('#create_archive_input').val()) + $("input[name=archive_extension]:checked").val() + ' created successfully !!<p>', 3000, 'rounded alert-success');
-                                    $('.loader').remove();
+                                    Materialize.toast('<p class="alert-success">Archive ' + archive_name + ' extracted in folder ' + data.data + ' !!<p>', 3000, 'rounded alert-success');
                                 } else {
-                                    Materialize.toast('<p class="alert-failed">' + data.error + '<p>', 2000, 'rounded alert-failed');
-                                    $('.loader').remove();
+                                    Materialize.toast('<p class="alert-failed">' + data.error + '<p>', 3000, 'rounded alert-failed');
                                 }
                             }
                         });
@@ -282,5 +293,8 @@ $(document).ready(function () {
                 "quit": {name: "Quit", callback: $.noop
             }
         }});
+    });
+    $(document.body).on('click', '#refresh', function () {
+        send_path($('#current_path').text());
     });
 });
