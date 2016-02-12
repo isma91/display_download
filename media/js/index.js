@@ -275,7 +275,6 @@ $(document).ready(function () {
                         $.post('controllers/file_system.php', {action: 'extract_archive', archive_name: archive_name, archive_password: $('#archive_password').val(), from: null, to: $('#current_path').text()}, function (data, textStatus) {
                             if (textStatus === "success") {
                                 data = JSON.parse(data);
-                                console.log(data);
                                 if (data.error === null) {
                                     send_path($('#current_path').text());
                                     Materialize.toast('<p class="alert-success">Archive ' + archive_name + ' extracted in folder ' + data.data + ' !!<p>', 3000, 'rounded alert-success');
