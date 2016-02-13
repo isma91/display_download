@@ -155,17 +155,17 @@ $(document).ready(function () {
         pdf = new PDFObject({url: url_pdf, pdfOpenParams: { scrollbars: '1', toolbar: '1', statusbar: '1', messages: '1', navpanes: '1' }}).embed('pdf_view');
         $('#pdf_modal').openModal();
     }
-    function check_duplicate_file(file_name) {
+    function check_duplicate_file(file_name, path, div_id_selector, button_id_selector) {
         "use strict";
-        $.post('controllers/check_duplicate_file.php', {file_type: 'file', path: $('#current_path').text(), file_name: file_name}, function (data, textStatus) {
+        $.post('controllers/check_duplicate_file.php', {file_type: 'file', path: path, file_name: file_name}, function (data, textStatus) {
             if (textStatus === "success") {
                 data = JSON.parse(data);
                 if (data.file_exists === true) {
-                    $('#check_new_name').html('<p class="error">Name already taken !!</p>');
-                    $("#rename_button").attr('disabled', "true");
+                    $(div_id_selector).html('<p class="error">Name already taken !!</p>');
+                    $(button_id_selector).attr('disabled', "true");
                 } else {
-                    $('#check_new_name').html('<p class="error"></p>');
-                    $("#rename_button").removeAttr('disabled');
+                    $(div_id_selector).html('<p class="error"></p>');
+                    $(button_id_selector).removeAttr('disabled');
                 }
             }
         });
@@ -179,7 +179,7 @@ $(document).ready(function () {
             if ($.trim($(this).val()).match(/\//) !== null || $.trim($(this).val()) === "") {
                 $("#rename_button").attr('disabled', "true");
             } else {
-                check_duplicate_file($.trim($(this).val()), $('#current_path').text());
+                check_duplicate_file($.trim($(this).val()), $('#current_path').text(), '#check_new_name', "#rename_button");
             }
         });
         $('#rename_button').click(function () {
@@ -189,6 +189,32 @@ $(document).ready(function () {
                     if (data.error === null) {
                         send_path($('#current_path').text());
                         Materialize.toast('<p class="alert-success">' + old_name + ' rename in ' + data.data + ' successfully !!<p>', 3000, 'rounded alert-success');
+                    } else {
+                        Materialize.toast('<p class="alert-failed">' + data.error + '<p>', 3000, 'rounded alert-failed');
+                    }
+                }
+            });
+        });
+    }
+    function send_copy(file_name) {
+        "use strict";
+        $('#copy_modal').remove();
+        $('#path_content').append('<div id="copy_modal" class="modal bottom-sheet"><div class="modal-content"><div class="row"><h4>Enter the directory where you want to copy</h4><div id="checked_copy"></div><div class="input-field"><i class="material-icons prefix">content_copy</i><input id="copy_input" type="text"><label for="copy_input">Directory</label></div></div></div><div class="modal-footer"><button id="copy_button" class="btn modal-action modal-close waves-effect waves-light btn-flat" disabled="true">Copy</button><button class="btn modal-action modal-close waves-effect waves-light btn-flat">Quit</button></div></div>');
+        $('#copy_modal').openModal();
+        $("#copy_input").on('change paste keyup', function () {
+            if ($.trim($(this).val()) === "") {
+                $("#copy_button").attr('disabled', "true");
+            } else {
+                check_duplicate_file(file_name, $.trim($(this).val()), '#checked_copy', "#copy_button");
+            }
+        });
+        $('#copy_button').click(function () {
+            $.post('controllers/file_system.php', {action: 'copy', file_name: file_name, to: $.trim($('#copy_input').val()), from: $('#current_path').text()}, function (data, textStatus) {
+                if (textStatus === "success") {
+                    data = JSON.parse(data);
+                    if (data.error === null) {
+                        send_path($('#current_path').text());
+                        Materialize.toast('<p class="alert-success">' + file_name + ' copy in ' + data.data + ' successfully !!<p>', 3000, 'rounded alert-success');
                     } else {
                         Materialize.toast('<p class="alert-failed">' + data.error + '<p>', 3000, 'rounded alert-failed');
                     }
@@ -279,7 +305,9 @@ $(document).ready(function () {
         $.contextMenu({
             selector: '.folder',
             items: {
-                "copy": {name: "Copy"},
+                "copy": {name: "Copy", callback: function () {
+                    send_copy($(this).children('p').text());
+                }},
                 "rename": {name: "Rename", callback: function () {
                     send_rename($(this).children('p').text());
                 }},
@@ -299,7 +327,9 @@ $(document).ready(function () {
             selector: '.file',
             items: {
                 "edit": {name: "Edit"},
-                "copy": {name: "Copy"},
+                "copy": {name: "Copy", callback: function () {
+                    send_copy($(this).children('p').text());
+                }},
                 "delete": {name: "Delete"},
                 "rename": {name: "Rename", callback: function () {
                     send_rename($(this).children('p').text());
