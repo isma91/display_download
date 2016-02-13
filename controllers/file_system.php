@@ -374,7 +374,48 @@ function delete_file ($name, $from) {
 		}
 	}
 }
+function get_content_file ($name, $path) {
+	if (!empty($name) && !empty($path)) {
+		if (file_exists($path . $name)) {
+			if (is_file($path . $name)) {
+				if (is_readable($path . $name)) {
+					try {
+						$file_content = file_get_contents($path . $name);
+						$extension = pathinfo($path . $name, PATHINFO_EXTENSION);
+						$array_extension = array(
+							"js" => "javascript",
+							"py" => "python",
+							"md" => "markdown"
+							);
+						foreach ($array_extension as $short_extension => $full_extension) {
+							if ($extension === $short_extension) {
+								$extension = $full_extension;
+							}
+						}
+						send_json(null, array("file_content" => $file_content, "extension" => $extension));
+					} catch (Exception $e) {
+						send_json($e->getMessage(), null);
+						throw new Exception($e->getMessage());
+						
+					}
+				} else {
+					send_json($name . " can't be readed !!", null);
+					throw new Exception($name . " can't be readed !!");
+				}
+			} else {
+				send_json($name . " is not a file !!", null);
+				throw new Exception($name . " is not a file !!");
+			}
+		} else {
+			send_json("File not found !!", null);
+			throw new Exception("File not found !!");
+		}
+	}
+}
 switch ($_POST["action"]) {
+	case 'file_get_content':
+	get_content_file($_POST['name'], rtrim($_POST['from'], "/") . "/");
+	break;
 	case 'create_folder':
 	create_folder($_POST["name"], rtrim($_POST["to"], '/') . '/');
 	break;
