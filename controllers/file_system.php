@@ -296,7 +296,7 @@ function copy_file($name, $from, $to) {
 						copy($from . $name, $to . $name);
 					} else {
 						mkdir($to . $name);
-						$list_folder = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($from . $name));	
+						$list_folder = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($from . $name));
 						foreach ($list_folder as $file) {
 							if ($file->isDir()) {
 								continue;
@@ -331,6 +331,49 @@ function copy_file($name, $from, $to) {
 		}
 	}
 }
+function recursive_delete_folder($directory) {
+	if (is_dir($directory)) {
+		$objects = scandir($directory);
+		foreach ($objects as $object) {
+			if ($object !== "." && $object !== "..") {
+				if (filetype($directory . "/" . $object) === "dir") {
+					recursive_delete_folder($directory . "/" . $object);
+				}
+				else {
+					unlink($directory . "/" . $object);
+				}
+			}
+		}
+		reset($objects);
+		rmdir($directory . "/");
+	}
+}
+function delete_file ($name, $from) {
+	if (!empty($name) && !empty($from)) {
+		if (file_exists($from . $name)) {
+			if (is_file($from . $name)) {
+				try {
+					unlink($from . $name);
+					send_json(null, null);
+				} catch (Exception $e) {
+					send_json($e->getMessage(), null);
+					throw new Exception($e->getMessage());
+				}
+			} else {
+				try {
+					recursive_delete_folder($from . $name);
+					send_json(null, null);
+				} catch (Exception $e) {
+					send_json($e->getMessage());
+					throw new Exception($e->getMessage());
+				}
+			}
+		} else {
+			send_json("File not found !!", null);
+			throw new Exception("File not found !!");
+		}
+	}
+}
 switch ($_POST["action"]) {
 	case 'create_folder':
 	create_folder($_POST["name"], rtrim($_POST["to"], '/') . '/');
@@ -341,7 +384,8 @@ switch ($_POST["action"]) {
 	case 'rename':
 	rename_file($_POST["old_name"], $_POST["new_name"], rtrim($_POST["to"], "/") . '/');
 	break;
-	case 'delete':
+	case 'remove':
+	delete_file($_POST["name"], rtrim($_POST["from"], "/") . "/");
 	break;
 	case 'create_archive':
 	create_archive($_POST["archive_name"], rtrim($_POST["to"], '/') . '/', $_POST["extension"], $_POST["files"]);
