@@ -222,6 +222,25 @@ $(document).ready(function () {
             });
         });
     }
+    function send_remove(file_name) {
+        "use strict";
+        $('#remove_modal').remove();
+        $('#path_content').append('<div id="remove_modal" class="modal"><div class="modal-content"><h4>Are you sure you want to delete ' + file_name  + ' ?</h4></div><div class="modal-footer"><button id="remove_button" class="btn modal-action modal-close waves-effect waves-light btn-flat">Remove</button><button class="btn modal-action modal-close waves-effect waves-light btn-flat">Quit</button></div></div>');
+        $('#remove_modal').openModal();
+        $('#remove_button').click(function () {
+            $.post('controllers/file_system.php', {action: 'remove', name: file_name, to: null, from: $('#current_path').text()}, function (data, textStatus) {
+                if (textStatus === "success") {
+                    data = JSON.parse(data);
+                    if (data.error === null) {
+                        send_path($('#current_path').text());
+                        Materialize.toast('<p class="alert-success">' + file_name + ' deleted successfully !!<p>', 3000, 'rounded alert-success');
+                    } else {
+                        Materialize.toast('<p class="alert-failed">' + data.error + '<p>', 3000, 'rounded alert-failed');
+                    }
+                }
+            });
+        });
+    }
     $('#send_path').click(function () {
         get_original_path();
         setTimeout(function () {
@@ -311,7 +330,9 @@ $(document).ready(function () {
                 "rename": {name: "Rename", callback: function () {
                     send_rename($(this).children('p').text());
                 }},
-                "delete": {name: "Delete"},
+                "delete": {name: "Delete", callback: function () {
+                    send_remove($(this).children('p').text());
+                }},
                 "archive": {name: "Archive", callback: function () {
                     file = $(this).children('p').text();
                     send_archive();
@@ -330,7 +351,9 @@ $(document).ready(function () {
                 "copy": {name: "Copy", callback: function () {
                     send_copy($(this).children('p').text());
                 }},
-                "delete": {name: "Delete"},
+                "delete": {name: "Delete", callback: function () {
+                    send_remove($(this).children('p').text());
+                }},
                 "rename": {name: "Rename", callback: function () {
                     send_rename($(this).children('p').text());
                 }},
