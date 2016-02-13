@@ -242,3 +242,9 @@ a:focus {
 #refresh {
 	cursor: pointer;
 }
+.modal-content textarea,
+.modal textarea,
+#code_mirror_modal textarea,
+.CodeMirror-code {
+	text-align: left;
+}
