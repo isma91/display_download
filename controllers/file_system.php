@@ -202,7 +202,6 @@ function extract_archive ($archive_name, $path, $password) {
 			$counter_duplicate++;
 		}
 		mkdir($path . $only_file_name);
-		$a = 0;
 		if ($extension === "zip") {
 			try {
 				$zip = zip_open($path . $archive_name);
@@ -288,11 +287,56 @@ function rename_file($old_name, $new_name, $path) {
 		}
 	}
 }
+function copy_file($name, $from, $to) {
+	if (!empty($name) && !empty($from) && !empty($to)) {
+		if (file_exists($from . $name)) {
+			if (!file_exists($to . $name)) {
+				try {
+					if (is_file($form . $name)) {
+						copy($from . $name, $to . $name);
+					} else {
+						mkdir($to . $name);
+						$list_folder = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($from . $name));	
+						foreach ($list_folder as $file) {
+							if ($file->isDir()) {
+								continue;
+							}
+							$exploded = explode("/", substr($file->getPathname(), strlen($from . $name)));
+							$path_after_name = "";
+							for ($i = 0; $i < count($exploded) - 1; $i++) {
+								if (!empty($exploded[$i])) {
+									$path_after_name = $path_after_name . "/" . $exploded[$i];
+								}
+								if ($i === count($exploded) - 2) {
+									if (!file_exists($to . $name . $path_after_name)) {
+										mkdir($to . $name . $path_after_name, 0777, true);
+									}
+									copy($from . $name . $path_after_name . "/" . $exploded[count($exploded) - 1], $to . $name . $path_after_name . "/" . $exploded[count($exploded) - 1]);
+								}
+							}
+						}
+					}
+					send_json(null, $to . $name);
+				} catch (Exception $e) {
+					send_json($e->getMessage(), null);
+					throw new Exception($e->getMessage());
+				}
+			} else {
+				send_json("File " . $name . " already exist !!", null);
+				throw new Exception("File " . $name . " already exist !!");
+			}
+		} else {
+			send_json("File not found !!", null);
+			throw new Exception("File not found !!");
+		}
+	}
+}
 switch ($_POST["action"]) {
 	case 'create_folder':
 	create_folder($_POST["name"], rtrim($_POST["to"], '/') . '/');
 	break;
 	case 'copy':
+	copy_file($_POST["file_name"], rtrim($_POST["from"], "/") . "/", rtrim($_POST['to'], "/") . "/");
 	break;
 	case 'rename':
 	rename_file($_POST["old_name"], $_POST["new_name"], rtrim($_POST["to"], "/") . '/');
