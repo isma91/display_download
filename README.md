@@ -1,6 +1,7 @@
 # display_download
 ##Display a structured download directory
 ###For now, only for LAMP !!
+####You need to have PHP5.4+
   
 Put the project where you want to display  
 
@@ -25,7 +26,8 @@ For now, you can :
 * directly exract zip, tar, tar.gz, tar.bz2 or rar archive
 * display directly a pdf
 * directly rename a folder or a file
-* directly copy a folder or a file in a specified directory  
+* directly copy a folder or a file in a specified directory
+* directly delete a folder or a file  
 
 If you want to use rar and zip feature, you must install rar and zip library :  
 ```
