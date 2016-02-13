@@ -13,6 +13,7 @@ Here are the plugins and libraries that i use :
 * [colorbox](http://www.jacklmoore.com/colorbox/)
 * [contextMenu](http://swisnl.github.io/jQuery-contextMenu/)
 * [PDFObject](http://pdfobject.com/)
+* [CodeMirror](https://codemirror.net/)
 
 For now, you can :  
 * display all folders
