@@ -5,7 +5,8 @@
   
 Put the project where you want to display  
 
-Here are the plugins and libraries that i use :  
+Plugins and libraries :  
+---------------------
 * [muicss](https://www.muicss.com/)
 * [materialize](http://materializecss.com/)
 * [google material icons](https://design.google.com/icons/)
@@ -15,7 +16,8 @@ Here are the plugins and libraries that i use :
 * [PDFObject](http://pdfobject.com/)
 * [CodeMirror](https://codemirror.net/)
 
-For now, you can :  
+Features :  
+--------
 * display all folders
 * display the majority of file (hide or not)
 * listen directly the audio file
@@ -29,7 +31,9 @@ For now, you can :
 * directly rename a folder or a file
 * directly copy a folder or a file in a specified directory
 * directly delete a folder or a file
-* directly edit you code file  
+* (experimental) directly edit you code file  
+
+------------------------------------------------------------  
 
 If you want to use rar and zip feature, you must install rar and zip library :  
 ```
