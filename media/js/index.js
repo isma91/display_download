@@ -6,7 +6,7 @@ $(document).ready(function () {
     array_audio = ["mp3", "wav", "wma", "aac"];
     array_video = ["avi", "ogv", "mpg", "webm", "wmv", "flv", "mkv", "mp4", "mov"];
     array_picture = ["png", "jpg", "bmp"];
-    array_code = ["php", "html", "css", "xhtml", "js", "json", "py", "sh", "phar", "sql", "md"];
+    array_code = ["asp", "aspx", "bat", "cfm", "class", "conf", "cpp", "css", "db", "dbf", "dll", "htaccess", "html", "jar", "js", "jsp", "md", "odb", "pdb", "php", "sql", "xhtml", "xml"];
     function get_original_path () {
         "use strict";
         $.post('controllers/get_original_path.php', function (data, textStatus) {
@@ -241,18 +241,131 @@ $(document).ready(function () {
             });
         });
     }
-    function code_mirror_load (code_mirror_require, code_mirror_value, code_mirror_mode) {
+    function send_file_put_content (file_name, file_from, file_content) {
         "use strict";
-        $.getScript('media/js/code_mirror_modes/' + code_mirror_require + ".js", function (data, textStatus) {
+        $.post('controllers/file_system.php', {action: 'file_put_content', name: file_name, from: file_from, file_content: file_content}, function (data, textStatus) {
             if (textStatus === "success") {
-                $('#code_mirror_modal').remove();
-                $('#path_content').append('<div id="code_mirror_modal" class="modal bottom-sheet"><div class="modal-content"><textarea id="code_mirror_textarea">' + code_mirror_value + '</textarea></div><div class="modal-footer"><button id="code_mirror_button" class="btn modal-action modal-close waves-effect waves-light btn-flat">Apply Change</button><button class="btn modal-action modal-close waves-effect waves-light btn-flat">Quit</button></div></div>');
-                $('#code_mirror_modal').openModal();
-                CodeMirror.fromTextArea(document.getElementById('code_mirror_textarea'), {
-                    mode:  code_mirror_mode
+                data = JSON.parse(data);
+                if (data.error === null) {
+                    send_path($('#current_path').text());
+                    Materialize.toast('<p class="alert-success">' + file_name + ' was successfully saved !!<p>', 3000, 'rounded alert-success');
+                } else {
+                    Materialize.toast('<p class="alert-failed">' + data.error + '<p>', 3000, 'rounded alert-failed');
+                }
+            }
+        });
+    }
+    function code_mirror_load (code_mirror_value, file_name) {
+        "use strict";
+        var json_mime_type, code_mirror_extension_option, code_mirror_require, code_mirror_mode, code_mirror;
+        json_mime_type = {
+            "css" : "text/css",
+            "sass" : "text/x-scss",
+            "less" : "text/x-less",
+            "html-xml-css-js" : "text/html",
+            "html" : "text/html",
+            "html-php" : "application/x-httpd-php",
+            "http" : "message/http",
+            "java" : "text/x-java",
+            "objective-c" : "text/x-objectivec",
+            "javascript" : "text/javascript",
+            "json" : "application/json",
+            "markdown" : "text/x-markdown",
+            "nginx" : "text/nginx",
+            "perl" : "text/x-perl",
+            "php" : "text/php",
+            "python" : "text/x-python",
+            "ruby" : "text/x-ruby",
+            "sql" : "text/x-sql",
+            "mysql" : "text/x-mysql",
+            "mariadb" : "text/x-mariadb",
+            "cassandra" : "text/x-cassandra",
+            "plsql" : "text/x-plsql",
+            "mssql" : "text/x-mssql",
+            "hive" : "text/x-hive",
+            "pgsql" : "text/x-pgsql",
+            "swift" : "text/x-swift",
+            "twig" : "text/x-twig",
+            "xml" : "application/xml",
+            "yaml" : "text/x-yaml"
+        };
+        code_mirror_extension_option = "";
+        $.each(json_mime_type, function (extension, mime_type) {
+            code_mirror_extension_option = code_mirror_extension_option + '<option value="' + mime_type + '">' + extension + '</option>';
+        });
+        $('#code_mirror_extension_modal').remove();
+        $('#path_content').append('<div id="code_mirror_extension_modal" class="modal modal-fixed-footer"><div class="modal-content"><h4>Please choose your code mode</h4><div class="input-field"><select id="code_mirror_extension_select">' + code_mirror_extension_option + '</select><label>Code mode</label></div></div><div class="modal-footer"><button id="code_mirror_extension_button" class="btn modal-action modal-close waves-effect waves-light btn-flat">Choose mode</button><button class="btn modal-action modal-close waves-effect waves-light btn-flat">Quit</button></div></div>');
+        $('select').material_select();
+        $('#code_mirror_extension_modal').openModal();
+        $('#code_mirror_extension_button').click(function () {
+            $('#code_mirror_extension_modal').closeModal();
+            code_mirror_mode = $('#code_mirror_extension_select option:selected').val();
+            code_mirror_require = $('#code_mirror_extension_select option:selected').text();
+            if (code_mirror_require === "php" || code_mirror_require === "html" || code_mirror_require === "html-xml-css-js" || code_mirror_require === "html-php" || code_mirror_require === "css" || code_mirror_require === "javascript") {
+                $.getScript('media/js/code_mirror_modes/php.js', function (data_php, textStatus_php) {
+                    if (textStatus_php === "success") {
+                        $.getScript('media/js/code_mirror_modes/xml.js', function (data_xml, textStatus_xml) {
+                            if (textStatus_xml === "success") {
+                                $.getScript('media/js/code_mirror_modes/css.js', function (data_css, textStatus_css) {
+                                    if (textStatus_css === "success") {
+                                        $.getScript('media/js/code_mirror_modes/javascript.js', function (data_javavscript, textStatus_javascript) {
+                                            if (textStatus_javascript === "success") {
+                                                $.getScript('media/js/code_mirror_modes/htmlmixed.js', function (data_htmlmixed, textStatus_htmlmixed) {
+                                                    if (textStatus_htmlmixed === "success") {
+                                                        if (code_mirror_value === "") {
+                                                            Materialize.toast('<p class="alert-info">This file is empty !!<p>', 3000, 'rounded alert-info');
+                                                        }
+                                                        $('#code_mirror_modal').remove();
+                                                        $('#path_content').append('<div id="code_mirror_modal" class="modal bottom-sheet"><div class="modal-content"><textarea id="code_mirror_textarea">' + code_mirror_value + '</textarea></div><div class="modal-footer"><button id="code_mirror_button" class="btn modal-action modal-close waves-effect waves-light btn-flat">Save Change</button><button class="btn modal-action modal-close waves-effect waves-light btn-flat">Quit</button></div></div>');
+                                                        $('#code_mirror_modal').openModal();
+                                                        code_mirror = CodeMirror.fromTextArea(document.getElementById('code_mirror_textarea'), {
+                                                            lineNumbers: true,
+                                                            indentWithTabs: true,
+                                                            matchBrackets: true,
+                                                            indentUnit: 4,
+                                                            mode:  code_mirror_mode
+                                                        });
+                                                        code_mirror.on('change', function () {
+                                                            code_mirror.save();
+                                                        });
+                                                        $('#code_mirror_button').click(function () {
+                                                            send_file_put_content(file_name, $('#current_path').text(), $('#code_mirror_textarea').val());
+                                                        });
+                                                    } else {
+                                                        Materialize.toast('<p class="alert-failed">A requested js file can\'t be loaded !!<p>', 3000, 'rounded alert-failed');
+                                                    }
+                                                });
+                                            } else {
+                                                Materialize.toast('<p class="alert-failed">A requested js file can\'t be loaded !!<p>', 3000, 'rounded alert-failed');
+                                            }
+                                        });
+                                    } else {
+                                        Materialize.toast('<p class="alert-failed">A requested js file can\'t be loaded !!<p>', 3000, 'rounded alert-failed');
+                                    }
+                                });
+                            } else {
+                                Materialize.toast('<p class="alert-failed">A requested js file can\'t be loaded !!<p>', 3000, 'rounded alert-failed');
+                            }
+                        });
+                    } else {
+                        Materialize.toast('<p class="alert-failed">A requested js file can\'t be loaded !!<p>', 3000, 'rounded alert-failed');
+                    }
                 });
             } else {
-                Materialize.toast('<p class="alert-failed">A requested js file can\'t be loaded !!<p>', 3000, 'rounded alert-failed');
+                $.getScript('media/js/code_mirror_modes/' + code_mirror_require + '.js', function (data, textStatus) {
+                    if (textStatus === "success") {
+                        $('#code_mirror_modal').remove();
+                        $('#path_content').append('<div id="code_mirror_modal" class="modal bottom-sheet"><div class="modal-content"><textarea id="code_mirror_textarea">' + code_mirror_value + '</textarea></div><div class="modal-footer"><button id="code_mirror_button" class="btn modal-action modal-close waves-effect waves-light btn-flat">Apply Change</button><button class="btn modal-action modal-close waves-effect waves-light btn-flat">Quit</button></div></div>');
+                        $('#code_mirror_modal').openModal();
+                        CodeMirror.fromTextArea(document.getElementById('code_mirror_textarea'), {
+                            lineNumbers: true,
+                            indentWithTabs: true,
+                            matchBrackets: true,
+                            indentUnit: 4,
+                            mode:  code_mirror_mode
+                        });
+                    }
+                });
             }
         });
     }
@@ -262,7 +375,7 @@ $(document).ready(function () {
             if (textStatus === "success") {
                 data = JSON.parse(data);
                 if (data.error === null) {
-                    code_mirror_load(data.data.extension, data.data.file_content, data.data.extension);
+                    code_mirror_load(data.data.file_content, file_name);
                 } else {
                     Materialize.toast('<p class="alert-failed">' + data.error + '<p>', 3000, 'rounded alert-failed');
                 }
