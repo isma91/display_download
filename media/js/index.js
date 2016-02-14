@@ -2,11 +2,11 @@
 /*jslint devel : true*/
 /*global $, document, this, Materialize*/
 $(document).ready(function () {
-    var extension, parent_directory, array_audio, array_video, array_picture, i, j, k, properties, file, archive_name;
+    var extension, parent_directory, array_audio, array_video, array_picture, i, j, k, properties, file, archive_name, l, relative_path, encode_uri_component_file_name;
     array_audio = ["mp3", "wav", "wma", "aac"];
     array_video = ["avi", "ogv", "mpg", "webm", "wmv", "flv", "mkv", "mp4", "mov"];
     array_picture = ["png", "jpg", "bmp"];
-    array_code = ["php", "html", "css", "xhtml", "js", "json", "py", "sh", "phar"];
+    array_code = ["php", "html", "css", "xhtml", "js", "json", "py", "sh", "phar", "sql", "md"];
     function get_original_path () {
         "use strict";
         $.post('controllers/get_original_path.php', function (data, textStatus) {
@@ -241,6 +241,34 @@ $(document).ready(function () {
             });
         });
     }
+    function code_mirror_load (code_mirror_require, code_mirror_value, code_mirror_mode) {
+        "use strict";
+        $.getScript('media/js/code_mirror_modes/' + code_mirror_require + ".js", function (data, textStatus) {
+            if (textStatus === "success") {
+                $('#code_mirror_modal').remove();
+                $('#path_content').append('<div id="code_mirror_modal" class="modal bottom-sheet"><div class="modal-content"><textarea id="code_mirror_textarea">' + code_mirror_value + '</textarea></div><div class="modal-footer"><button id="code_mirror_button" class="btn modal-action modal-close waves-effect waves-light btn-flat">Apply Change</button><button class="btn modal-action modal-close waves-effect waves-light btn-flat">Quit</button></div></div>');
+                $('#code_mirror_modal').openModal();
+                CodeMirror.fromTextArea(document.getElementById('code_mirror_textarea'), {
+                    mode:  code_mirror_mode
+                });
+            } else {
+                Materialize.toast('<p class="alert-failed">A requested js file can\'t be loaded !!<p>', 3000, 'rounded alert-failed');
+            }
+        });
+    }
+    function send_file_content (file_name) {
+        "use strict";
+        $.post('controllers/file_system.php', {action: 'file_get_content', name: file_name, to: null, from: $('#current_path').text()}, function (data, textStatus) {
+            if (textStatus === "success") {
+                data = JSON.parse(data);
+                if (data.error === null) {
+                    code_mirror_load(data.data.extension, data.data.file_content, data.data.extension);
+                } else {
+                    Materialize.toast('<p class="alert-failed">' + data.error + '<p>', 3000, 'rounded alert-failed');
+                }
+            }
+        });
+    }
     $('#send_path').click(function () {
         get_original_path();
         setTimeout(function () {
@@ -259,11 +287,14 @@ $(document).ready(function () {
     });
     $(document.body).on('click', '.file', function () {
         extension = $(this).children('p').text().split('.').pop().toLowerCase();
+        relative_path = $('#current_path').text().replace($('#original_path').text(), "../").replace("//", "/") + "/";
+        relative_path = relative_path.replace('//', '/');
+        encode_uri_component_file_name = encodeURIComponent($(this).children('p').text());
         for (i = 0; i < array_audio.length; i = i + 1) {
             if (extension === array_audio[i]) {
                 $('#audio').remove();
                 $('audio').remove();
-                $.colorbox({html:'<h1 id="cboxTitle">Click on the close button at left bottom to close the window</h1><div id="audio"><audio controls autoplay><source src="' + $('#current_path').text().replace($('#original_path').text(), "../").replace("//", "/") + "/" + encodeURIComponent($(this).children('p').text()) + '" /></audio></div>', width:'90%', height: '90%'});
+                $.colorbox({html:'<h1 id="cboxTitle">Click on the close button at left bottom to close the window</h1><div id="audio"><audio controls autoplay><source src="' + relative_path + encode_uri_component_file_name + '" /></audio></div>', width:'90%', height: '90%'});
                 break;
             }
         }
@@ -271,7 +302,7 @@ $(document).ready(function () {
             if (extension === array_video[j]) {
                 $('#video').remove();
                 $('.cboxPhoto').remove();
-                $.colorbox({html:'<h1 id="cboxTitle">Click on the close button at left bottom to close the window</h1><div id="video"><video controls="controls" preload="true"><source src="' + $('#current_path').text().replace($('#original_path').text(), "../").replace("//", "/") + "/" + encodeURIComponent($(this).children('p').text()) + '" /></video></div>', width:'90%', height: '90%'});
+                $.colorbox({html:'<h1 id="cboxTitle">Click on the close button at left bottom to close the window</h1><div id="video"><video controls="controls" preload="true"><source src="' + relative_path + encode_uri_component_file_name + '" /></video></div>', width:'90%', height: '90%'});
                 break;
             }
         }
@@ -279,12 +310,18 @@ $(document).ready(function () {
             if (extension === array_picture[k]) {
                 $('#video').remove();
                 $('.cboxPhoto').remove();
-                $.colorbox({href: $('#current_path').text().replace($('#original_path').text(), "../").replace("//", "/") + "/" + encodeURIComponent($(this).children('p').text()), width:'90%', height: '90%'});
+                $.colorbox({href: relative_path + encode_uri_component_file_name, width:'90%', height: '90%'});
                 break;
             }
         }
         if (extension === "pdf") {
-            display_pdf($('#current_path').text().replace($('#original_path').text(), "../").replace("//", "/") + "/" + encodeURIComponent($(this).children('p').text()));
+            display_pdf(relative_path + encode_uri_component_file_name);
+        }
+        for (l = 0; l < array_code.length; l = l + 1) {
+            if (extension === array_code[l]) {
+                send_file_content(encode_uri_component_file_name);
+                break;
+            }
         }
     });
     $(document.body).on('contextmenu', '.mui-panel', function () {
