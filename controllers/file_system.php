@@ -382,7 +382,7 @@ function get_content_file ($name, $path) {
 					try {
 						$file_content = file_get_contents($path . $name);
 						$extension = pathinfo($path . $name, PATHINFO_EXTENSION);
-						send_json(null, array("file_content" => $file_content, "extension" => $extension));
+						send_json(null, array("file_content" => $file_content));
 					} catch (Exception $e) {
 						send_json($e->getMessage(), null);
 						throw new Exception($e->getMessage());
@@ -402,9 +402,33 @@ function get_content_file ($name, $path) {
 		}
 	}
 }
+function put_content_file ($name, $path, $content) {
+	if (!empty($name) && !empty($path)) {
+		if (file_exists($path . $name)) {
+			if (is_writable($path . $name)) {
+				try {
+					file_put_contents($path . $name, $content);
+					send_json(null, null);
+				} catch (Exception $e) {
+					send_json($e->getMessage(), null);
+					throw new Exception($e->getMessage());
+				}
+			} else {
+				send_json($name . " can't be writable !!", null);
+				throw new Exception($name . " can't be writable !!");
+			}
+		} else {
+			send_json("File " . $name . " not found !!", null);
+			throw new Exception("File " . $name . " not found !!");
+		}
+	}
+}
 switch ($_POST["action"]) {
 	case 'file_get_content':
 	get_content_file($_POST['name'], rtrim($_POST['from'], "/") . "/");
+	break;
+	case 'file_put_content':
+	put_content_file($_POST['name'], rtrim($_POST['from'], "/") . "/", $_POST["file_content"]);
 	break;
 	case 'create_folder':
 	create_folder($_POST["name"], rtrim($_POST["to"], '/') . '/');
