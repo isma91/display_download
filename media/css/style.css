@@ -248,3 +248,7 @@ a:focus {
 .CodeMirror-code {
 	text-align: left;
 }
+.dropdown-content li>a,
+.dropdown-content li>span {
+	color: #7B7B7B;
+}
