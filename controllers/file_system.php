@@ -382,16 +382,6 @@ function get_content_file ($name, $path) {
 					try {
 						$file_content = file_get_contents($path . $name);
 						$extension = pathinfo($path . $name, PATHINFO_EXTENSION);
-						$array_extension = array(
-							"js" => "javascript",
-							"py" => "python",
-							"md" => "markdown"
-							);
-						foreach ($array_extension as $short_extension => $full_extension) {
-							if ($extension === $short_extension) {
-								$extension = $full_extension;
-							}
-						}
 						send_json(null, array("file_content" => $file_content, "extension" => $extension));
 					} catch (Exception $e) {
 						send_json($e->getMessage(), null);
