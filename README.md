@@ -28,7 +28,8 @@ For now, you can :
 * display directly a pdf
 * directly rename a folder or a file
 * directly copy a folder or a file in a specified directory
-* directly delete a folder or a file  
+* directly delete a folder or a file
+* directly edit you code file  
 
 If you want to use rar and zip feature, you must install rar and zip library :  
 ```
