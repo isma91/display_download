@@ -2,7 +2,7 @@
 /**
 * File_system.php
 *
-* Create, copy, delete and many thing
+* A PHP script to do some things with files
 *
 * PHP 5.6.17-0+deb8u1 (cli) (built: Jan 13 2016 09:10:12)
 *
@@ -12,9 +12,6 @@
 * @license  http://opensource.org/licenses/gpl-license.php GNU Public License
 * @link     https://github.com/isma91/display_download/blob/master/controllers/file_system.php
 */
-ini_set('xdebug.var_display_max_depth', -1);
-ini_set('xdebug.var_display_max_children', -1);
-ini_set('xdebug.var_display_max_data', -1);
 function send_json ($error, $data) {
 	echo json_encode(array('error' => $error, 'data' => $data));
 }
@@ -381,7 +378,6 @@ function get_content_file ($name, $path) {
 				if (is_readable($path . $name)) {
 					try {
 						$file_content = file_get_contents($path . $name);
-						$extension = pathinfo($path . $name, PATHINFO_EXTENSION);
 						send_json(null, array("file_content" => $file_content));
 					} catch (Exception $e) {
 						send_json($e->getMessage(), null);
