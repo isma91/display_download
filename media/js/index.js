@@ -2,7 +2,7 @@
 /*jslint devel : true*/
 /*global $, document, this, Materialize*/
 $(document).ready(function () {
-    var extension, parent_directory, array_audio, array_video, array_picture, i, j, k, properties, file, archive_name, l, relative_path, encode_uri_component_file_name;
+    var extension, parent_directory, array_audio, array_video, array_picture, i, j, k, properties, file, archive_name, l, relative_path, encode_uri_component_file_name, m;
     array_audio = ["mp3", "wav", "wma", "aac"];
     array_video = ["avi", "ogv", "mpg", "webm", "wmv", "flv", "mkv", "mp4", "mov"];
     array_picture = ["png", "jpg", "bmp"];
@@ -439,6 +439,9 @@ $(document).ready(function () {
     });
     $(document.body).on('contextmenu', '.mui-panel', function () {
         extension = $(this).children('p').text().split('.').pop().toLowerCase();
+        relative_path = $('#current_path').text().replace($('#original_path').text(), "../").replace("//", "/") + "/";
+        relative_path = relative_path.replace('//', '/');
+        encode_uri_component_file_name = encodeURIComponent($(this).children('p').text());
         $.contextMenu({
             selector: '.mui-panel',
             items: {
@@ -497,7 +500,14 @@ $(document).ready(function () {
         $.contextMenu({
             selector: '.file',
             items: {
-                "edit": {name: "Edit"},
+                "edit": {name: "Edit", callback: function () {
+                    for (m = 0; m < array_code.length; m = m + 1) {
+                        if (extension === array_code[m]) {
+                            send_file_content(encode_uri_component_file_name);
+                            break;
+                        }
+                    }
+                }},
                 "copy": {name: "Copy", callback: function () {
                     send_copy($(this).children('p').text());
                 }},
