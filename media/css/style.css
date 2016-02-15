@@ -258,3 +258,7 @@ a:focus {
 	margin-right: 5%;
 
 }
+[type="checkbox"].filled-in:checked+label:after {
+	background-color: #000000;
+	border: 2px solid #000000;
+}
