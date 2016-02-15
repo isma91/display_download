@@ -6,7 +6,7 @@ $(document).ready(function () {
     array_audio = ["mp3", "wav", "wma", "aac"];
     array_video = ["avi", "ogv", "mpg", "webm", "wmv", "flv", "mkv", "mp4", "mov"];
     array_picture = ["png", "jpg", "bmp"];
-    array_code = ["asp", "aspx", "bat", "cfm", "class", "conf", "cpp", "css", "db", "dbf", "dll", "htaccess", "html", "jar", "js", "jsp", "md", "odb", "pdb", "php", "sql", "xhtml", "xml"];
+    array_code = ["asp", "aspx", "bat", "cfm", "class", "conf", "cpp", "css", "db", "dbf", "dll", "htaccess", "html", "jar", "js", "jsp", "md", "odb", "pdb", "php", "py", "rb", "sql", "sh", "xhtml", "xml"];
     function get_original_path () {
         "use strict";
         $.post('controllers/get_original_path.php', function (data, textStatus) {
@@ -70,8 +70,11 @@ $(document).ready(function () {
                                     });
                                 });
                             }
+                            $('#the_body').append('<div class="row mui-panel"><i class="material-icons prefix menu_icons tooltipped" id="copy" data-position="top" data-tooltip="Copy">content_copy</i><i class="material-icons prefix menu_icons tooltipped" id="remove" data-position="top" data-tooltip="Delete">delete</i><i class="material-icons prefix menu_icons tooltipped" id="archive" data-position="top" data-tooltip="Archive">archive</i></div>');
                             $('#the_body').append('<div class="row mui-panel">There is ' + data.folder.length + ' folder(s) and ' + file_count + ' file(s)</div>');
+                            $('#the_body').append('<div class="row mui-panel" id="selection"></div>');
                             $('#the_body').append('<div class="row"><div class="col s12" id="parent_directory"><i class="material-icons prefix">reply</i>Parent Directory</div><div class="mui-panel" id="path_content"><div class="row">' + folders + files + '</div></div></div>');
+                            $('.tooltipped').tooltip({delay: 50});
                         }, 1000);
                     }
                 }
@@ -553,5 +556,16 @@ $(document).ready(function () {
     });
     $(document.body).on('click', '#refresh', function () {
         send_path($('#current_path').text());
+    });
+    $(document.body).on('click', '.brand-logo', function () {
+        send_path($('#original_path').text());
+    });
+    $(document.body).on('click', '#copy', function () {
+        $('.folder').prepend('<i class="icons material-icons prefix add">add</i><i class="icons material-icons prefix remove">remove</i>');
+        $('.file').prepend('<i class="icons material-icons prefix add">add</i><i class="icons material-icons prefix remove">remove</i>');
+    });
+    $(document.body).on('click', '#remove', function () {
+    });
+    $(document.body).on('click', '#archive', function () {
     });
 });
