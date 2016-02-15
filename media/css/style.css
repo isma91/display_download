@@ -252,3 +252,9 @@ a:focus {
 .dropdown-content li>span {
 	color: #7B7B7B;
 }
+.menu_icons {
+	cursor: pointer;
+	margin-left: 5%;
+	margin-right: 5%;
+
+}
