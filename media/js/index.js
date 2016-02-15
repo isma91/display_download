@@ -2,7 +2,8 @@
 /*jslint devel : true*/
 /*global $, document, this, Materialize*/
 $(document).ready(function () {
-    var extension, parent_directory, array_audio, array_video, array_picture, i, j, k, properties, file, archive_name, l, relative_path, encode_uri_component_file_name, m;
+    var extension, parent_directory, array_audio, array_video, array_picture, i, j, k, properties, file, archive_name, l, relative_path, encode_uri_component_file_name, m, select_mode;
+    select_mode = false;
     array_audio = ["mp3", "wav", "wma", "aac"];
     array_video = ["avi", "ogv", "mpg", "webm", "wmv", "flv", "mkv", "mp4", "mov"];
     array_picture = ["png", "jpg", "bmp"];
@@ -76,6 +77,49 @@ $(document).ready(function () {
                             $('#the_body').append('<div class="row"><div class="col s12" id="parent_directory"><i class="material-icons prefix">reply</i>Parent Directory</div><div class="mui-panel" id="path_content"><div class="row">' + folders + files + '</div></div></div>');
                             $('.tooltipped').tooltip({delay: 50});
                         }, 1000);
+                    }
+                }
+            });
+        } else {
+            Materialize.toast('<p class="alert-failed">Empty path !!<p>', 3000, 'rounded alert-failed');
+        }
+    }
+    function send_path_select_mode (path) {
+        "use strict";
+        var folders, files;
+        if (path !== "") {
+            $.post('controllers/list_file.php', {directory: path}, function (data, textStatus) {
+                if (textStatus === "success") {
+                    data = JSON.parse(data);
+                    if (data.folder.length === 0 && data.file.length === 0) {
+                        Materialize.toast('<p class="alert-failed">No folder or file here !!<p>', 3000, 'rounded alert-failed');
+                    } else {
+                        folders = '';
+                        if (data.folder.length !== 0) {
+                            $.each(data.folder, function (index, folder) {
+                                if (folder === ".git") {
+                                    folders = folders + '<div class="folder col s3"><input type="checkbox" class="filled-in" id="folder_' + folder + '" /><label for="folder_' + folder + '"></label><img class="icons" src="media/img/icons/git.png" alt="git folder" /><p class="folder_name">' + folder + '</p></div>';
+                                } else if (folder === ".idea") {
+                                    folders = folders + '<div class="folder col s3"><input type="checkbox" class="filled-in" id="folder_' + folder + '" /><label for="folder_' + folder + '"></label><img class="icons" src="media/img/icons/phpstorm.png" alt="phpstorm folder" /><p class="folder_name">' + folder + '</p></div>';
+                                } else {
+                                    folders = folders + '<div class="folder col s3"><input type="checkbox" class="filled-in" id="folder_' + folder + '" /><label for="folder_' + folder + '"></label><img class="icons" src="media/img/icons/folder.png" alt="folder" /><p class="folder_name">' + folder + '</p></div>';
+                                }
+                            });
+                        }
+                        files = '';
+                        if (Object.keys(data.file).length !== 0) {
+                            $.each(data.file, function (extension, array_file) {
+                                if (extension === "") {
+                                    extension = "txt";
+                                } else if (extension === "phar") {
+                                    extension = "php";
+                                }
+                                $.each(array_file, function (index, file) {
+                                    files = files + '<div class="file col s3"><input type="checkbox" class="filled-in" id="file_' + file + '" /><label for="file_' + file + '"></label><img class="icons" src="media/img/icons/' + extension + '.png" alt="' + extension + ' file" /><p class="file_name">' + file + '</p></div>';
+                                });
+                            });
+                        }
+                        $('#path_content').html(folders + files);
                     }
                 }
             });
@@ -392,7 +436,10 @@ $(document).ready(function () {
         }, 500);
     });
     $(document.body).on('click', '.folder', function () {
-        send_path($('#current_path').text() + '/' + $(this).children('p').text());
+        console.log(select_mode);
+        if (select_mode === false) {
+            send_path($('#current_path').text() + '/' + $(this).children('p').text());
+        }
     });
     $(document.body).on('click', '#parent_directory', function () {
         parent_directory = $('#current_path').text().replace(/\/[^\/]+$/, '');
@@ -406,37 +453,39 @@ $(document).ready(function () {
         relative_path = $('#current_path').text().replace($('#original_path').text(), "../").replace("//", "/") + "/";
         relative_path = relative_path.replace('//', '/');
         encode_uri_component_file_name = encodeURIComponent($(this).children('p').text());
-        for (i = 0; i < array_audio.length; i = i + 1) {
-            if (extension === array_audio[i]) {
-                $('#audio').remove();
-                $('audio').remove();
-                $.colorbox({html:'<h1 id="cboxTitle">Click on the close button at left bottom to close the window</h1><div id="audio"><audio controls autoplay><source src="' + relative_path + encode_uri_component_file_name + '" /></audio></div>', width:'90%', height: '90%'});
-                break;
+        if (select_mode === false) {
+            for (i = 0; i < array_audio.length; i = i + 1) {
+                if (extension === array_audio[i]) {
+                    $('#audio').remove();
+                    $('audio').remove();
+                    $.colorbox({html:'<h1 id="cboxTitle">Click on the close button at left bottom to close the window</h1><div id="audio"><audio controls autoplay><source src="' + relative_path + encode_uri_component_file_name + '" /></audio></div>', width:'90%', height: '90%'});
+                    break;
+                }
             }
-        }
-        for (j = 0; j < array_video.length; j = j + 1) {
-            if (extension === array_video[j]) {
-                $('#video').remove();
-                $('.cboxPhoto').remove();
-                $.colorbox({html:'<h1 id="cboxTitle">Click on the close button at left bottom to close the window</h1><div id="video"><video controls="controls" preload="true"><source src="' + relative_path + encode_uri_component_file_name + '" /></video></div>', width:'90%', height: '90%'});
-                break;
+            for (j = 0; j < array_video.length; j = j + 1) {
+                if (extension === array_video[j]) {
+                    $('#video').remove();
+                    $('.cboxPhoto').remove();
+                    $.colorbox({html:'<h1 id="cboxTitle">Click on the close button at left bottom to close the window</h1><div id="video"><video controls="controls" preload="true"><source src="' + relative_path + encode_uri_component_file_name + '" /></video></div>', width:'90%', height: '90%'});
+                    break;
+                }
             }
-        }
-        for (k = 0; k < array_picture.length; k = k + 1) {
-            if (extension === array_picture[k]) {
-                $('#video').remove();
-                $('.cboxPhoto').remove();
-                $.colorbox({href: relative_path + encode_uri_component_file_name, width:'90%', height: '90%'});
-                break;
+            for (k = 0; k < array_picture.length; k = k + 1) {
+                if (extension === array_picture[k]) {
+                    $('#video').remove();
+                    $('.cboxPhoto').remove();
+                    $.colorbox({href: relative_path + encode_uri_component_file_name, width:'90%', height: '90%'});
+                    break;
+                }
             }
-        }
-        if (extension === "pdf") {
-            display_pdf(relative_path + encode_uri_component_file_name);
-        }
-        for (l = 0; l < array_code.length; l = l + 1) {
-            if (extension === array_code[l]) {
-                send_file_content(encode_uri_component_file_name);
-                break;
+            if (extension === "pdf") {
+                display_pdf(relative_path + encode_uri_component_file_name);
+            }
+            for (l = 0; l < array_code.length; l = l + 1) {
+                if (extension === array_code[l]) {
+                    send_file_content(encode_uri_component_file_name);
+                    break;
+                }
             }
         }
     });
@@ -561,8 +610,10 @@ $(document).ready(function () {
         send_path($('#original_path').text());
     });
     $(document.body).on('click', '#copy', function () {
-        $('.folder').prepend('<i class="icons material-icons prefix add">add</i><i class="icons material-icons prefix remove">remove</i>');
-        $('.file').prepend('<i class="icons material-icons prefix add">add</i><i class="icons material-icons prefix remove">remove</i>');
+        if (select_mode === false) {
+            send_path_select_mode($('#current_path').text());
+        }
+        select_mode = true;
     });
     $(document.body).on('click', '#remove', function () {
     });
