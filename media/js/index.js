@@ -2,7 +2,9 @@
 /*jslint devel : true*/
 /*global $, document, this, Materialize*/
 $(document).ready(function () {
-    var extension, parent_directory, array_audio, array_video, array_picture, i, j, k, properties, file, archive_name, l, relative_path, encode_uri_component_file_name, m, select_mode;
+    var extension, parent_directory, array_audio, array_video, array_picture, i, j, k, properties, file, archive_name, l, relative_path, encode_uri_component_file_name, m, select_mode, array_selected_file, array_selected_folder, label_for;
+    array_selected_file = [];
+    array_selected_folder = [];
     select_mode = false;
     array_audio = ["mp3", "wav", "wma", "aac"];
     array_video = ["avi", "ogv", "mpg", "webm", "wmv", "flv", "mkv", "mp4", "mov"];
@@ -98,11 +100,11 @@ $(document).ready(function () {
                         if (data.folder.length !== 0) {
                             $.each(data.folder, function (index, folder) {
                                 if (folder === ".git") {
-                                    folders = folders + '<div class="folder col s3"><input type="checkbox" class="filled-in" id="folder_' + folder + '" /><label for="folder_' + folder + '"></label><img class="icons" src="media/img/icons/git.png" alt="git folder" /><p class="folder_name">' + folder + '</p></div>';
+                                    folders = folders + '<div class="folder col s3"><input type="checkbox" value="not_selected" class="filled-in" id="folder_' + folder + '" /><label class="select_file_folder" for="folder_' + folder + '"></label><img class="icons" src="media/img/icons/git.png" alt="git folder" /><p class="folder_name">' + folder + '</p></div>';
                                 } else if (folder === ".idea") {
-                                    folders = folders + '<div class="folder col s3"><input type="checkbox" class="filled-in" id="folder_' + folder + '" /><label for="folder_' + folder + '"></label><img class="icons" src="media/img/icons/phpstorm.png" alt="phpstorm folder" /><p class="folder_name">' + folder + '</p></div>';
+                                    folders = folders + '<div class="folder col s3"><input type="checkbox" value="not_selected" class="filled-in" id="folder_' + folder + '" /><label class="select_file_folder" for="folder_' + folder + '"></label><img class="icons" src="media/img/icons/phpstorm.png" alt="phpstorm folder" /><p class="folder_name">' + folder + '</p></div>';
                                 } else {
-                                    folders = folders + '<div class="folder col s3"><input type="checkbox" class="filled-in" id="folder_' + folder + '" /><label for="folder_' + folder + '"></label><img class="icons" src="media/img/icons/folder.png" alt="folder" /><p class="folder_name">' + folder + '</p></div>';
+                                    folders = folders + '<div class="folder col s3"><input type="checkbox" value="not_selected" class="filled-in" id="folder_' + folder + '" /><label class="select_file_folder" for="folder_' + folder + '"></label><img class="icons" src="media/img/icons/folder.png" alt="folder" /><p class="folder_name">' + folder + '</p></div>';
                                 }
                             });
                         }
@@ -115,7 +117,7 @@ $(document).ready(function () {
                                     extension = "php";
                                 }
                                 $.each(array_file, function (index, file) {
-                                    files = files + '<div class="file col s3"><input type="checkbox" class="filled-in" id="file_' + file + '" /><label for="file_' + file + '"></label><img class="icons" src="media/img/icons/' + extension + '.png" alt="' + extension + ' file" /><p class="file_name">' + file + '</p></div>';
+                                    files = files + '<div class="file col s3"><input type="checkbox" value="not_selected" class="filled-in" id="file_' + file + '" /><label class="select_file_folder" for="file_' + file + '"></label><img class="icons" src="media/img/icons/' + extension + '.png" alt="' + extension + ' file" /><p class="file_name">' + file + '</p></div>';
                                 });
                             });
                         }
@@ -429,6 +431,16 @@ $(document).ready(function () {
             }
         });
     }
+    function unduplicate_and_select (name ,array_name, display_selector, add_or_remove) {
+        "use strict";
+        if (add_or_remove === "add") {
+            array_name.push(name);
+            $.unique(array_name);
+        } else if (add_or_remove === "remove") {
+            array_name.splice($.inArray(name, array_name), 1);
+        }
+        $(display_selector).html('You selected ' + array_selected_folder.length + ' folder(s) and ' + array_selected_file.length + ' file(s)');
+    }
     $('#send_path').click(function () {
         get_original_path();
         setTimeout(function () {
@@ -436,7 +448,6 @@ $(document).ready(function () {
         }, 500);
     });
     $(document.body).on('click', '.folder', function () {
-        console.log(select_mode);
         if (select_mode === false) {
             send_path($('#current_path').text() + '/' + $(this).children('p').text());
         }
@@ -618,5 +629,24 @@ $(document).ready(function () {
     $(document.body).on('click', '#remove', function () {
     });
     $(document.body).on('click', '#archive', function () {
+    });
+    $(document.body).on('click', '.select_file_folder', function () {
+        label_for = $(this).attr('for');
+        label_for = label_for.replace(/\./g, "\\.");
+        if ($('input#' + label_for).attr('value') === "not_selected") {
+            $('input#' + label_for).attr('value', "selected");
+            if (label_for.substr(0, 7) === "folder_") {
+                unduplicate_and_select(label_for.substr(7), array_selected_folder, "#selection", "add");
+            } else if (label_for.substr(0, 5) === "file_") {
+                unduplicate_and_select(label_for.substr(5), array_selected_file, "#selection", "add");
+            }
+        } else {
+            $('input#' + label_for).attr('value', "not_selected");
+            if (label_for.substr(0, 7) === "folder_") {
+                unduplicate_and_select(label_for.substr(7), array_selected_folder, "#selection", "remove");
+            } else if (label_for.substr(0, 5) === "file_") {
+                unduplicate_and_select(label_for.substr(5), array_selected_file, "#selection", "remove");
+            }
+        }
     });
 });
