@@ -262,3 +262,9 @@ a:focus {
 	background-color: #000000;
 	border: 2px solid #000000;
 }
+#validate_select,
+#cancel_select {
+	cursor: pointer;
+	margin-left: 0.5%;
+	margin-right: 0.5%;
+}
