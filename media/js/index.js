@@ -2,7 +2,7 @@
 /*jslint devel : true*/
 /*global $, document, this, Materialize*/
 $(document).ready(function () {
-    var extension, parent_directory, array_audio, array_video, array_picture, i, j, k, properties, file, archive_name, l, relative_path, encode_uri_component_file_name, m, select_mode, array_selected_file, array_selected_folder, label_for;
+    var extension, parent_directory, array_audio, array_video, array_picture, i, j, k, properties, file, archive_name, l, relative_path, encode_uri_component_file_name, m, select_mode, array_selected_file, array_selected_folder, label_for, label_for_id;
     array_selected_file = [];
     array_selected_folder = [];
     select_mode = false;
@@ -121,6 +121,50 @@ $(document).ready(function () {
                                 });
                             });
                         }
+                        $('#path_content').html(folders + files);
+                    }
+                }
+            });
+        } else {
+            Materialize.toast('<p class="alert-failed">Empty path !!<p>', 3000, 'rounded alert-failed');
+        }
+    }
+    function send_path_unselect_mode (path) {
+        "use strict";
+        var folders, files;
+        if (path !== "") {
+            $.post('controllers/list_file.php', {directory: path}, function (data, textStatus) {
+                if (textStatus === "success") {
+                    data = JSON.parse(data);
+                    if (data.folder.length === 0 && data.file.length === 0) {
+                        Materialize.toast('<p class="alert-failed">No folder or file here !!<p>', 3000, 'rounded alert-failed');
+                    } else {
+                        folders = '';
+                        if (data.folder.length !== 0) {
+                            $.each(data.folder, function (index, folder) {
+                                if (folder === ".git") {
+                                    folders = folders + '<div class="folder col s3"><img class="icons" src="media/img/icons/git.png" alt="git folder" /><p class="folder_name">' + folder + '</p></div>';
+                                } else if (folder === ".idea") {
+                                    folders = folders + '<div class="folder col s3"><img class="icons" src="media/img/icons/phpstorm.png" alt="phpstorm folder" /><p class="folder_name">' + folder + '</p></div>';
+                                } else {
+                                    folders = folders + '<div class="folder col s3"><img class="icons" src="media/img/icons/folder.png" alt="folder" /><p class="folder_name">' + folder + '</p></div>';
+                                }
+                            });
+                        }
+                        files = '';
+                        if (Object.keys(data.file).length !== 0) {
+                            $.each(data.file, function (extension, array_file) {
+                                if (extension === "") {
+                                    extension = "txt";
+                                } else if (extension === "phar") {
+                                    extension = "php";
+                                }
+                                $.each(array_file, function (index, file) {
+                                    files = files + '<div class="file col s3"><img class="icons" src="media/img/icons/' + extension + '.png" alt="' + extension + ' file" /><p class="file_name">' + file + '</p></div>';
+                                });
+                            });
+                        }
+                        $('#selection').html('');
                         $('#path_content').html(folders + files);
                     }
                 }
@@ -439,7 +483,12 @@ $(document).ready(function () {
         } else if (add_or_remove === "remove") {
             array_name.splice($.inArray(name, array_name), 1);
         }
-        $(display_selector).html('You selected ' + array_selected_folder.length + ' folder(s) and ' + array_selected_file.length + ' file(s)');
+        if (array_selected_file.length === 0 && array_selected_folder.length === 0) {
+            $(display_selector).html('No file and folder selected !! ');
+        } else {
+            $(display_selector).html('You selected ' + array_selected_folder.length + ' folder(s) and ' + array_selected_file.length + ' file(s) <i class="material-icons prefix tooltipped" id="validate_select" data-position="top" data-tooltip="Validate selected file and folder">check_circle</i><i class="material-icons prefix tooltipped" id="cancel_select" data-position="top" data-tooltip="Cancel selection">cancel</i>');
+            $('.tooltipped').tooltip({delay: 50});
+        }
     }
     $('#send_path').click(function () {
         get_original_path();
@@ -632,21 +681,27 @@ $(document).ready(function () {
     });
     $(document.body).on('click', '.select_file_folder', function () {
         label_for = $(this).attr('for');
-        label_for = label_for.replace(/\./g, "\\.");
-        if ($('input#' + label_for).attr('value') === "not_selected") {
-            $('input#' + label_for).attr('value', "selected");
+        label_for_id = label_for.replace(/\./g, "\\.");
+        if ($('input#' + label_for_id).attr('value') === "not_selected") {
+            $('input#' + label_for_id).attr('value', "selected");
             if (label_for.substr(0, 7) === "folder_") {
                 unduplicate_and_select(label_for.substr(7), array_selected_folder, "#selection", "add");
             } else if (label_for.substr(0, 5) === "file_") {
                 unduplicate_and_select(label_for.substr(5), array_selected_file, "#selection", "add");
             }
         } else {
-            $('input#' + label_for).attr('value', "not_selected");
+            $('input#' + label_for_id).attr('value', "not_selected");
             if (label_for.substr(0, 7) === "folder_") {
                 unduplicate_and_select(label_for.substr(7), array_selected_folder, "#selection", "remove");
             } else if (label_for.substr(0, 5) === "file_") {
                 unduplicate_and_select(label_for.substr(5), array_selected_file, "#selection", "remove");
             }
         }
+    });
+    $(document.body).on('click', '#validate_select', function () {
+    });
+    $(document.body).on('click', '#cancel_select', function () {
+        select_mode = false;
+        send_path_unselect_mode($('#current_path').text());
     });
 });
