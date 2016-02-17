@@ -289,9 +289,9 @@ function copy_file($name, $from, $to) {
 		if (file_exists($from . $name)) {
 			if (!file_exists($to . $name)) {
 				try {
-					if (is_file($form . $name)) {
+					if (is_file($from . $name)) {
 						copy($from . $name, $to . $name);
-					} else {
+					} elseif (is_dir($from . $name)) {
 						mkdir($to . $name);
 						$list_folder = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($from . $name));
 						foreach ($list_folder as $file) {
@@ -413,6 +413,31 @@ function delete_file ($name, $from) {
 		}
 	}
 }
+function delete_multiple_file ($array_file, $array_folder, $path) {
+	if (!empty($path)) {
+		if (!empty($array_file)) {
+			foreach ($array_file as $file) {
+				try {
+					unlink($path . $file);
+				} catch (Exception $e) {
+					send_json($e->getMessage());
+					throw new Exception($e->getMessage());
+				}
+			}
+		}
+		if (!empty($array_folder)) {
+			foreach ($array_folder as $folder) {
+				try {
+					recursive_delete_folder($path . $folder);
+				} catch (Exception $e) {
+					send_json($e->getMessage());
+					throw new Exception($e->getMessage());
+				}
+			}
+		}
+		send_json(null, null);
+	}
+}
 function get_content_file ($name, $path) {
 	if (!empty($name) && !empty($path)) {
 		if (file_exists($path . $name)) {
@@ -482,6 +507,9 @@ switch ($_POST["action"]) {
 	break;
 	case 'remove':
 	delete_file($_POST["name"], rtrim($_POST["from"], "/") . "/");
+	break;
+	case 'multiple_remove':
+	delete_multiple_file($_POST["file"], $_POST["folder"], rtrim($_POST["from"], "/") . "/");
 	break;
 	case 'create_archive':
 	create_archive($_POST["archive_name"], rtrim($_POST["to"], '/') . '/', $_POST["extension"], $_POST["files"]);
