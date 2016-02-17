@@ -2,7 +2,7 @@
 /*jslint devel : true*/
 /*global $, document, this, Materialize*/
 $(document).ready(function () {
-    var extension, parent_directory, array_audio, array_video, array_picture, i, j, k, properties, file, archive_name, l, relative_path, encode_uri_component_file_name, m, select_mode, array_selected_file, array_selected_folder, label_for, label_for_id;
+    var extension, parent_directory, array_audio, array_video, array_picture, i, j, k, properties, file, archive_name, l, relative_path, encode_uri_component_file_name, m, select_mode, array_selected_file, array_selected_folder, label_for, label_for_id, action_name_selected;
     array_selected_file = [];
     array_selected_folder = [];
     select_mode = false;
@@ -173,6 +173,10 @@ $(document).ready(function () {
             Materialize.toast('<p class="alert-failed">Empty path !!<p>', 3000, 'rounded alert-failed');
         }
     }
+    function unselect_mode () {
+        select_mode = false;
+        send_path_unselect_mode($('#current_path').text());
+    }
     function send_properties (file_name, path) {
         "use strict";
         $('#get_properties_modal').remove();
@@ -289,25 +293,57 @@ $(document).ready(function () {
             });
         });
     }
-    function send_copy(file_name) {
+    function send_copy(file_name, is_array) {
         "use strict";
+        var copy_title, copy_multiple_input;
+        if (is_array === false) {
+            copy_title = '';
+            copy_multiple_input = '';
+        } else {
+            copy_title = ', they are gonna be copied in a folder';
+            copy_multiple_input = '<div class="input-field"><i class="material-icons prefix">folder</i><input id="copy_multiple_input" type="text"><label for="copy_multiple_input">Folder"s name</label></div>';
+        }
         $('#copy_modal').remove();
-        $('#path_content').append('<div id="copy_modal" class="modal bottom-sheet"><div class="modal-content"><div class="row"><h4>Enter the directory where you want to copy</h4><div id="checked_copy"></div><div class="input-field"><i class="material-icons prefix">content_copy</i><input id="copy_input" type="text"><label for="copy_input">Directory</label></div></div></div><div class="modal-footer"><button id="copy_button" class="btn modal-action modal-close waves-effect waves-light btn-flat" disabled="true">Copy</button><button class="btn modal-action modal-close waves-effect waves-light btn-flat">Quit</button></div></div>');
+        $('#path_content').append('<div id="copy_modal" class="modal bottom-sheet"><div class="modal-content"><div class="row"><h4>Enter the directory where you want to copy ' + copy_title + '</h4><div id="checked_copy"></div><div class="input-field"><i class="material-icons prefix">content_copy</i><input id="copy_input" type="text"><label for="copy_input">Directory</label></div>' + copy_multiple_input + '</div></div><div class="modal-footer"><button id="copy_button" class="btn modal-action modal-close waves-effect waves-light btn-flat" disabled="true">Copy</button><button class="btn modal-action modal-close waves-effect waves-light btn-flat">Quit</button></div></div>');
         $('#copy_modal').openModal();
-        $("#copy_input").on('change paste keyup', function () {
-            if ($.trim($(this).val()) === "") {
-                $("#copy_button").attr('disabled', "true");
-            } else {
-                check_duplicate_file(file_name, $.trim($(this).val()), '#checked_copy', "#copy_button");
-            }
-        });
+        if (is_array === false) {
+            $("#copy_input").on('change paste keyup', function () {
+                if ($.trim($(this).val()) === "") {
+                    $("#copy_button").attr('disabled', "true");
+                } else {
+                    check_duplicate_file(file_name, $.trim($(this).val()), '#checked_copy', "#copy_button");
+                }
+            });
+        } else {
+            $("#copy_input").on('change paste keyup', function () {
+                if ($.trim($(this).val()) === "") {
+                    $("#copy_button").attr('disabled', "true");
+                } else {
+                    check_duplicate_file($.trim($('#copy_multiple_input').val()), $.trim($(this).val()), '#checked_copy', "#copy_button");
+                }
+            });
+            $("#copy_multiple_input").on('change paste keyup', function () {
+                if ($.trim($(this).val()) === "") {
+                    $("#copy_button").attr('disabled', "true");
+                } else {
+                    check_duplicate_file($.trim($(this).val()), $.trim($('#copy_input').val()), '#checked_copy', "#copy_button");
+                }
+            });
+        }
         $('#copy_button').click(function () {
-            $.post('controllers/file_system.php', {action: 'copy', file_name: file_name, to: $.trim($('#copy_input').val()), from: $('#current_path').text()}, function (data, textStatus) {
+            var action_name;
+            if (is_array === false) {
+                action_name = "copy";
+            } else {
+                action_name = "multiple_copy";
+                unselect_mode();
+            }
+            $.post('controllers/file_system.php', {action: action_name, folder : array_selected_folder, file : array_selected_file, folder_name : $.trim($('#copy_multiple_input').val()), to: $.trim($('#copy_input').val()), from: $('#current_path').text()}, function (data, textStatus) {
                 if (textStatus === "success") {
                     data = JSON.parse(data);
                     if (data.error === null) {
                         send_path($('#current_path').text());
-                        Materialize.toast('<p class="alert-success">' + file_name + ' copy in ' + data.data + ' successfully !!<p>', 3000, 'rounded alert-success');
+                        Materialize.toast('<p class="alert-success">You seleteced files and folders are successfully copied in ' + data.data + ' !!<p>', 3000, 'rounded alert-success');
                     } else {
                         Materialize.toast('<p class="alert-failed">' + data.error + '<p>', 3000, 'rounded alert-failed');
                     }
@@ -590,7 +626,7 @@ $(document).ready(function () {
             selector: '.folder',
             items: {
                 "copy": {name: "Copy", callback: function () {
-                    send_copy($(this).children('p').text());
+                    send_copy($(this).children('p').text(), false);
                 }},
                 "rename": {name: "Rename", callback: function () {
                     send_rename($(this).children('p').text());
@@ -621,7 +657,7 @@ $(document).ready(function () {
                     }
                 }},
                 "copy": {name: "Copy", callback: function () {
-                    send_copy($(this).children('p').text());
+                    send_copy($(this).children('p').text(), false);
                 }},
                 "delete": {name: "Delete", callback: function () {
                     send_remove($(this).children('p').text());
@@ -674,6 +710,7 @@ $(document).ready(function () {
             send_path_select_mode($('#current_path').text());
         }
         select_mode = true;
+        action_name_selected = "multiple_copy";
     });
     $(document.body).on('click', '#remove', function () {
     });
@@ -699,9 +736,11 @@ $(document).ready(function () {
         }
     });
     $(document.body).on('click', '#validate_select', function () {
+        if (action_name_selected === "multiple_copy") {
+            send_copy(true, true);
+        }
     });
     $(document.body).on('click', '#cancel_select', function () {
-        select_mode = false;
-        send_path_unselect_mode($('#current_path').text());
+        unselect_mode();
     });
 });
