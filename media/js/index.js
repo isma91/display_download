@@ -5,7 +5,7 @@ $(document).ready(function () {
     var extension, parent_directory, array_audio, array_video, array_picture, i, j, k, properties, file, archive_name, l, relative_path, encode_uri_component_file_name, m, select_mode, array_selected_file, array_selected_folder, label_for, label_for_id, action_name_selected;
     array_selected_file = [];
     array_selected_folder = [];
-    select_mode = false;
+    select_mode = "false";
     array_audio = ["mp3", "wav", "wma", "aac"];
     array_video = ["avi", "ogv", "mpg", "webm", "wmv", "flv", "mkv", "mp4", "mov"];
     array_picture = ["png", "jpg", "bmp"];
@@ -174,7 +174,8 @@ $(document).ready(function () {
         }
     }
     function unselect_mode () {
-        select_mode = false;
+        $('.backdrop').remove();
+        select_mode = "false";
         send_path_unselect_mode($('#current_path').text());
     }
     function send_properties (file_name, path) {
@@ -351,10 +352,34 @@ $(document).ready(function () {
             });
         });
     }
-    function send_remove(file_name) {
+    function send_remove(file_name, is_array) {
         "use strict";
+        var list_file_folder;
         $('#remove_modal').remove();
-        $('#path_content').append('<div id="remove_modal" class="modal"><div class="modal-content"><h4>Are you sure you want to delete ' + file_name  + ' ?</h4></div><div class="modal-footer"><button id="remove_button" class="btn modal-action modal-close waves-effect waves-light btn-flat">Remove</button><button class="btn modal-action modal-close waves-effect waves-light btn-flat">Quit</button></div></div>');
+        if (is_array === false) {
+            list_file_folder = file_name;
+        } else {
+            list_file_folder = '<ul class="collection with-header"><li class="collection-header"><h4>Files</h4></li>';
+            if (array_selected_file.length === 0) {
+                list_file_folder = list_file_folder + '<li class="collection-item">No file selected !!</li>';
+            } else {
+                $.each(array_selected_file, function (index, file) {
+                    list_file_folder = list_file_folder + '<li class="collection-item">' + file + '</li>';
+                });
+            }
+            list_file_folder = list_file_folder + '</ul>';
+            list_file_folder = '<ul class="collection with-header"><li class="collection-header"><h4>Folders</h4></li>';
+            if (array_selected_folder.length === 0) {
+                list_file_folder = list_file_folder + '<li class="collection-item">No folder selected !!</li>';
+            } else {
+                $.each(array_selected_folder, function (index, folder) {
+                    list_file_folder = list_file_folder + '<li class="collection-item">' + folder + '</li>';
+                });
+            }
+            list_file_folder = list_file_folder + '</ul>';
+
+        }
+        $('#path_content').append('<div id="remove_modal" class="modal"><div class="modal-content"><h4>Are you sure you want to delete ' + list_file_folder  + ' ?</h4></div><div class="modal-footer"><button id="remove_button" class="btn modal-action modal-close waves-effect waves-light btn-flat">Remove</button><button class="btn modal-action modal-close waves-effect waves-light btn-flat">Quit</button></div></div>');
         $('#remove_modal').openModal();
         $('#remove_button').click(function () {
             $.post('controllers/file_system.php', {action: 'remove', name: file_name, to: null, from: $('#current_path').text()}, function (data, textStatus) {
@@ -533,7 +558,7 @@ $(document).ready(function () {
         }, 500);
     });
     $(document.body).on('click', '.folder', function () {
-        if (select_mode === false) {
+        if (select_mode === "false") {
             send_path($('#current_path').text() + '/' + $(this).children('p').text());
         }
     });
@@ -632,7 +657,7 @@ $(document).ready(function () {
                     send_rename($(this).children('p').text());
                 }},
                 "delete": {name: "Delete", callback: function () {
-                    send_remove($(this).children('p').text());
+                    send_remove($(this).children('p').text(), false);
                 }},
                 "archive": {name: "Archive", callback: function () {
                     file = $(this).children('p').text();
@@ -660,7 +685,7 @@ $(document).ready(function () {
                     send_copy($(this).children('p').text(), false);
                 }},
                 "delete": {name: "Delete", callback: function () {
-                    send_remove($(this).children('p').text());
+                    send_remove($(this).children('p').text(), false);
                 }},
                 "rename": {name: "Rename", callback: function () {
                     send_rename($(this).children('p').text());
@@ -706,15 +731,23 @@ $(document).ready(function () {
         send_path($('#original_path').text());
     });
     $(document.body).on('click', '#copy', function () {
-        if (select_mode === false) {
+        if (select_mode === "false") {
             send_path_select_mode($('#current_path').text());
         }
-        select_mode = true;
+        select_mode = "true";
         action_name_selected = "multiple_copy";
     });
     $(document.body).on('click', '#remove', function () {
+        if (select_mode === "false") {
+            send_path_select_mode($('#current_path').text());
+        }
+        select_mode = "true";
     });
     $(document.body).on('click', '#archive', function () {
+        if (select_mode === "false") {
+            send_path_select_mode($('#current_path').text());
+        }
+        select_mode = "true";
     });
     $(document.body).on('click', '.select_file_folder', function () {
         label_for = $(this).attr('for');
