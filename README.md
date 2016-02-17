@@ -30,7 +30,9 @@ Features :
 * display directly a pdf
 * directly rename a folder or a file
 * directly copy a folder or a file in a specified directory
+* directly copy multiple files and/or folders in a specified directory
 * directly delete a folder or a file
+* directly delete multiple files and/or folders or a file
 * (experimental) directly edit you code file  
 
 ------------------------------------------------------------  
