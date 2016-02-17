@@ -33,7 +33,7 @@ Features :
 * directly copy multiple files and/or folders in a specified directory
 * directly delete a folder or a file
 * directly delete multiple files and/or folders
-* (experimental) directly edit you code file  
+* (experimental) directly edit your code file  
 
 ------------------------------------------------------------  
 
