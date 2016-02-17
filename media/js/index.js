@@ -296,8 +296,8 @@ $(document).ready(function () {
     }
     function send_copy(file_name, is_array) {
         "use strict";
-        var copy_title, copy_multiple_input;
-        if (is_array === false) {
+        var copy_title, copy_multiple_input, action_name;
+        if (is_array === "false") {
             copy_title = '';
             copy_multiple_input = '';
         } else {
@@ -307,7 +307,7 @@ $(document).ready(function () {
         $('#copy_modal').remove();
         $('#path_content').append('<div id="copy_modal" class="modal bottom-sheet"><div class="modal-content"><div class="row"><h4>Enter the directory where you want to copy ' + copy_title + '</h4><div id="checked_copy"></div><div class="input-field"><i class="material-icons prefix">content_copy</i><input id="copy_input" type="text"><label for="copy_input">Directory</label></div>' + copy_multiple_input + '</div></div><div class="modal-footer"><button id="copy_button" class="btn modal-action modal-close waves-effect waves-light btn-flat" disabled="true">Copy</button><button class="btn modal-action modal-close waves-effect waves-light btn-flat">Quit</button></div></div>');
         $('#copy_modal').openModal();
-        if (is_array === false) {
+        if (is_array === "false") {
             $("#copy_input").on('change paste keyup', function () {
                 if ($.trim($(this).val()) === "") {
                     $("#copy_button").attr('disabled', "true");
@@ -332,19 +332,22 @@ $(document).ready(function () {
             });
         }
         $('#copy_button').click(function () {
-            var action_name;
-            if (is_array === false) {
+            if (is_array === "false") {
                 action_name = "copy";
             } else {
                 action_name = "multiple_copy";
                 unselect_mode();
             }
-            $.post('controllers/file_system.php', {action: action_name, folder : array_selected_folder, file : array_selected_file, folder_name : $.trim($('#copy_multiple_input').val()), to: $.trim($('#copy_input').val()), from: $('#current_path').text()}, function (data, textStatus) {
+            $.post('controllers/file_system.php', {action: action_name, file_name: file_name, folder : array_selected_folder, file : array_selected_file, folder_name : $.trim($('#copy_multiple_input').val()), to: $.trim($('#copy_input').val()), from: $('#current_path').text()}, function (data, textStatus) {
                 if (textStatus === "success") {
                     data = JSON.parse(data);
                     if (data.error === null) {
                         send_path($('#current_path').text());
-                        Materialize.toast('<p class="alert-success">You seleteced files and folders are successfully copied in ' + data.data + ' !!<p>', 3000, 'rounded alert-success');
+                        if (action_name === "multiple_copy") {
+                            Materialize.toast('<p class="alert-success">You seleteced files and folders are successfully copied in ' + data.data + ' !!<p>', 3000, 'rounded alert-success');
+                        } else {
+                            Materialize.toast('<p class="alert-success">' + file_name + ' was successfully copied in ' + data.data + ' !!<p>', 3000, 'rounded alert-success');
+                        }
                     } else {
                         Materialize.toast('<p class="alert-failed">' + data.error + '<p>', 3000, 'rounded alert-failed');
                     }
@@ -354,10 +357,11 @@ $(document).ready(function () {
     }
     function send_remove(file_name, is_array) {
         "use strict";
-        var list_file_folder;
+        var list_file_folder, action_name;
         $('#remove_modal').remove();
-        if (is_array === false) {
-            list_file_folder = file_name;
+        list_file_folder = "";
+        if (is_array === "false") {
+            list_file_folder = file_name + ' ? ';
         } else {
             list_file_folder = '<ul class="collection with-header"><li class="collection-header"><h4>Files</h4></li>';
             if (array_selected_file.length === 0) {
@@ -368,7 +372,7 @@ $(document).ready(function () {
                 });
             }
             list_file_folder = list_file_folder + '</ul>';
-            list_file_folder = '<ul class="collection with-header"><li class="collection-header"><h4>Folders</h4></li>';
+            list_file_folder = list_file_folder + '<ul class="collection with-header"><li class="collection-header"><h4>Folders</h4></li>';
             if (array_selected_folder.length === 0) {
                 list_file_folder = list_file_folder + '<li class="collection-item">No folder selected !!</li>';
             } else {
@@ -379,15 +383,25 @@ $(document).ready(function () {
             list_file_folder = list_file_folder + '</ul>';
 
         }
-        $('#path_content').append('<div id="remove_modal" class="modal"><div class="modal-content"><h4>Are you sure you want to delete ' + list_file_folder  + ' ?</h4></div><div class="modal-footer"><button id="remove_button" class="btn modal-action modal-close waves-effect waves-light btn-flat">Remove</button><button class="btn modal-action modal-close waves-effect waves-light btn-flat">Quit</button></div></div>');
+        $('#path_content').append('<div id="remove_modal" class="modal"><div class="modal-content"><h4>Are you sure you want to delete ' + list_file_folder  + '</h4></div><div class="modal-footer"><button id="remove_button" class="btn modal-action modal-close waves-effect waves-light btn-flat">Remove</button><button class="btn modal-action modal-close waves-effect waves-light btn-flat">Quit</button></div></div>');
         $('#remove_modal').openModal();
         $('#remove_button').click(function () {
-            $.post('controllers/file_system.php', {action: 'remove', name: file_name, to: null, from: $('#current_path').text()}, function (data, textStatus) {
+            if (is_array === "false") {
+                action_name = 'remove';
+            } else {
+                action_name = 'multiple_remove';
+                unselect_mode();
+            }
+            $.post('controllers/file_system.php', {action: action_name, name: file_name, file: array_selected_file, folder: array_selected_folder, to: null, from: $('#current_path').text()}, function (data, textStatus) {
                 if (textStatus === "success") {
                     data = JSON.parse(data);
                     if (data.error === null) {
                         send_path($('#current_path').text());
-                        Materialize.toast('<p class="alert-success">' + file_name + ' deleted successfully !!<p>', 3000, 'rounded alert-success');
+                        if (action_name === "multiple_remove") {
+                            Materialize.toast('<p class="alert-success">Your selected files and folders are deleted successfully !!<p>', 3000, 'rounded alert-success');
+                        } else {
+                            Materialize.toast('<p class="alert-success">' + file_name + ' deleted successfully !!<p>', 3000, 'rounded alert-success');
+                        }
                     } else {
                         Materialize.toast('<p class="alert-failed">' + data.error + '<p>', 3000, 'rounded alert-failed');
                     }
@@ -651,13 +665,13 @@ $(document).ready(function () {
             selector: '.folder',
             items: {
                 "copy": {name: "Copy", callback: function () {
-                    send_copy($(this).children('p').text(), false);
+                    send_copy($(this).children('p').text(), "false");
                 }},
                 "rename": {name: "Rename", callback: function () {
                     send_rename($(this).children('p').text());
                 }},
                 "delete": {name: "Delete", callback: function () {
-                    send_remove($(this).children('p').text(), false);
+                    send_remove($(this).children('p').text(), "false");
                 }},
                 "archive": {name: "Archive", callback: function () {
                     file = $(this).children('p').text();
@@ -682,10 +696,10 @@ $(document).ready(function () {
                     }
                 }},
                 "copy": {name: "Copy", callback: function () {
-                    send_copy($(this).children('p').text(), false);
+                    send_copy($(this).children('p').text(), "false");
                 }},
                 "delete": {name: "Delete", callback: function () {
-                    send_remove($(this).children('p').text(), false);
+                    send_remove($(this).children('p').text(), "false");
                 }},
                 "rename": {name: "Rename", callback: function () {
                     send_rename($(this).children('p').text());
@@ -742,6 +756,7 @@ $(document).ready(function () {
             send_path_select_mode($('#current_path').text());
         }
         select_mode = "true";
+        action_name_selected = "multiple_remove";
     });
     $(document.body).on('click', '#archive', function () {
         if (select_mode === "false") {
@@ -770,7 +785,9 @@ $(document).ready(function () {
     });
     $(document.body).on('click', '#validate_select', function () {
         if (action_name_selected === "multiple_copy") {
-            send_copy(true, true);
+            send_copy(true, "true");
+        } else if (action_name_selected === "multiple_remove") {
+            send_remove(true, "true");
         }
     });
     $(document.body).on('click', '#cancel_select', function () {
