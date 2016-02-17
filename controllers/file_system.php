@@ -328,6 +328,48 @@ function copy_file($name, $from, $to) {
 		}
 	}
 }
+function copy_multiple_file ($array_file, $array_folder, $folder_name, $from, $to) {
+	if (!empty($folder_name) && !empty($from) && !empty($to)) {
+		mkdir($to . $folder_name);
+		if (!empty($array_file)) {
+			foreach ($array_file as $file) {
+				try {
+					if (is_readable($from . $file)) {
+						copy($from . $file, $to . $folder_name . "/" . $file);
+					}
+				} catch (Exception $e) {
+					send_json($e->getMessage(), null);
+					throw new Exception($e->getMessage());
+				}
+			}
+		}
+		if (!empty($array_folder)) {
+			foreach ($array_folder as $folder) {
+				mkdir($to . $folder_name . "/" . $folder);
+				$list_folder = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($from . $folder));
+				foreach ($list_folder as $file) {
+					if ($file->isDir()) {
+						continue;
+					}
+					$exploded = explode("/", substr($file->getPathname(), strlen($from . $folder)));
+					$path_after_name = "";
+					for ($i = 0; $i < count($exploded) - 1; $i++) {
+						if (!empty($exploded[$i])) {
+							$path_after_name = $path_after_name . "/" . $exploded[$i];
+						}
+						if ($i === count($exploded) - 2) {
+							if (!file_exists($to . $folder_name . "/" . $folder . $path_after_name)) {
+								mkdir($to . $folder_name . "/" . $folder . $path_after_name, 0777, true);
+							}
+							copy($from . $folder . $path_after_name . "/" . $exploded[count($exploded) - 1], $to . $folder_name . "/" . $folder . $path_after_name . "/" . $exploded[count($exploded) - 1]);
+						}
+					}
+				}
+			}
+		}
+		send_json(null, $to . $folder_name);
+	}
+}
 function recursive_delete_folder($directory) {
 	if (is_dir($directory)) {
 		$objects = scandir($directory);
@@ -431,6 +473,9 @@ switch ($_POST["action"]) {
 	break;
 	case 'copy':
 	copy_file($_POST["file_name"], rtrim($_POST["from"], "/") . "/", rtrim($_POST['to'], "/") . "/");
+	break;
+	case 'multiple_copy':
+	copy_multiple_file($_POST["file"], $_POST["folder"], $_POST["folder_name"], rtrim($_POST["from"], "/") . "/", rtrim($_POST['to'], "/") . "/");
 	break;
 	case 'rename':
 	rename_file($_POST["old_name"], $_POST["new_name"], rtrim($_POST["to"], "/") . '/');
