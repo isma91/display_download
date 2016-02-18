@@ -178,6 +178,14 @@ $(document).ready(function () {
         select_mode = "false";
         send_path_unselect_mode($('#current_path').text());
     }
+    function selected_mode (action_name) {
+        "use strict";
+        if (select_mode === "false") {
+            send_path_select_mode($('#current_path').text());
+        }
+        select_mode = "true";
+        action_name_selected = action_name;
+    }
     function send_properties (file_name, path) {
         "use strict";
         $('#get_properties_modal').remove();
@@ -228,15 +236,32 @@ $(document).ready(function () {
             }
         });
     }
-    function send_create_archive () {
+    function send_create_archive (is_array) {
         "use strict";
+        var files;
+        files = [];
         $('#path_content').append('<div class="loader"></div>');
-        $.post('controllers/file_system.php', {action: 'create_archive', files: [file], archive_name: $.trim($('#create_archive_input').val()), from: null, to: $('#current_path').text(), extension: $("input[name=archive_extension]:checked").val()}, function (data, textStatus) {
+        if (is_array === "false") {
+            files.push(file);
+        } else {
+            if (array_selected_file.length > 0) {
+                $.each(array_selected_file, function (index, file) {
+                    files.push(file);
+                });
+            }
+            if (array_selected_folder.length > 0) {
+                $.each(array_selected_folder, function (index, folder) {
+                    files.push(folder);
+                });
+            }
+            unselect_mode();
+        }
+        $.post('controllers/file_system.php', {action: 'create_archive', files: files, archive_name: $.trim($('#create_archive_input').val()), from: null, to: $('#current_path').text(), extension: $("input[name=archive_extension]:checked").val(), multiple: is_array}, function (data, textStatus) {
             if (textStatus === "success") {
                 data = JSON.parse(data);
                 if (data.error === null) {
                     send_path($('#current_path').text());
-                    Materialize.toast('<p class="alert-success">Archive ' + $.trim($('#create_archive_input').val()) + $("input[name=archive_extension]:checked").val() + ' created successfully !!<p>', 3000, 'rounded alert-success');
+                    Materialize.toast('<p class="alert-success">Archive ' + data.data + ' created successfully !!<p>', 3000, 'rounded alert-success');
                     $('.loader').remove();
                 } else {
                     Materialize.toast('<p class="alert-failed">' + data.error + '<p>', 3000, 'rounded alert-failed');
@@ -294,7 +319,7 @@ $(document).ready(function () {
             });
         });
     }
-    function send_copy(file_name, is_array) {
+    function send_copy (file_name, is_array) {
         "use strict";
         var copy_title, copy_multiple_input, action_name;
         if (is_array === "false") {
@@ -677,7 +702,7 @@ $(document).ready(function () {
                     file = $(this).children('p').text();
                     send_archive();
                     $('#create_archive_button').click(function() {
-                        send_create_archive();
+                        send_create_archive("false");
                     });
                 }},
                 "separator": "---------",
@@ -708,7 +733,7 @@ $(document).ready(function () {
                     file = $(this).children('p').text();
                     send_archive();
                     $('#create_archive_button').click(function() {
-                        send_create_archive();
+                        send_create_archive("false");
                     });
                 }},
                 "extract": {name: "Extract archive here", callback: function () {
@@ -745,24 +770,13 @@ $(document).ready(function () {
         send_path($('#original_path').text());
     });
     $(document.body).on('click', '#copy', function () {
-        if (select_mode === "false") {
-            send_path_select_mode($('#current_path').text());
-        }
-        select_mode = "true";
-        action_name_selected = "multiple_copy";
+        selected_mode("multiple_copy");
     });
     $(document.body).on('click', '#remove', function () {
-        if (select_mode === "false") {
-            send_path_select_mode($('#current_path').text());
-        }
-        select_mode = "true";
-        action_name_selected = "multiple_remove";
+        selected_mode("multiple_remove");
     });
     $(document.body).on('click', '#archive', function () {
-        if (select_mode === "false") {
-            send_path_select_mode($('#current_path').text());
-        }
-        select_mode = "true";
+        selected_mode("multiple_archive");
     });
     $(document.body).on('click', '.select_file_folder', function () {
         label_for = $(this).attr('for');
@@ -788,6 +802,11 @@ $(document).ready(function () {
             send_copy(true, "true");
         } else if (action_name_selected === "multiple_remove") {
             send_remove(true, "true");
+        } else if (action_name_selected === "multiple_archive") {
+            send_archive();
+            $('#create_archive_button').click(function() {
+                send_create_archive("true");
+            });
         }
     });
     $(document.body).on('click', '#cancel_select', function () {
