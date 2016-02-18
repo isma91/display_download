@@ -26,6 +26,7 @@ Features :
 * directly create a folder
 * display directly the properties of a file
 * directly zip, tar, tar.gz or tar.bz2 a file or a folder
+* directly zip, tar, tar.gz or tar.bz2 multiple files and/or folders
 * directly exract zip, tar, tar.gz, tar.bz2 or rar archive
 * display directly a pdf
 * directly rename a folder or a file
