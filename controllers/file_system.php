@@ -73,7 +73,7 @@ function get_stat ($file_name, $path) {
 		}
 	}
 }
-function create_archive ($archive_name, $path, $extension, $files) {
+function create_archive ($archive_name, $path, $extension, $files, $multiple) {
 	if (!empty($archive_name) && !empty($path) && !empty($extension) && !empty($files)) {
 		$accepted_extension = false;
 		$array_files = array();
@@ -136,13 +136,31 @@ function create_archive ($archive_name, $path, $extension, $files) {
 			if (count($array_path_folders) > 0) {
 				$tmp_archive = tempnam("tmp", "tar") . ".tar";
 				$archive = new PharData($tmp_archive);
-				foreach ($array_path_folders as $folder) {
-					try {
-						$archive->buildFromDirectory($folder);
-					} catch (Exception $e) {
-						send_json($e->getMessage(), null);
-						throw new Exception($e->getMessage());
-						
+				if ($multiple === "false") {
+					foreach ($array_path_folders as $folder) {
+						try {
+							$archive->buildFromDirectory($folder);
+						} catch (Exception $e) {
+							send_json($e->getMessage(), null);
+							throw new Exception($e->getMessage());
+							
+						}
+					}
+				} else {
+					foreach ($array_path_folders as $folder) {
+						$list_folder = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($folder, FilesystemIterator::SKIP_DOTS));
+						foreach ($list_folder as $file) {
+							try {
+								if (is_readable($file->getPathname())) {
+									array_push($array_files, substr($file->getPathname(), strlen($path)));
+									array_push($array_path_files, $file->getPathname());
+								}
+							} catch (Exception $e) {
+								send_json($e->getMessage(), null);
+								throw new Exception($e->getMessage());
+								
+							}
+						}
 					}
 				}
 			}
@@ -163,10 +181,7 @@ function create_archive ($archive_name, $path, $extension, $files) {
 			$tmp_archive = $tmp_archive . "." . $archive_type_compress;
 		}
 		rename($tmp_archive, $path . $archive_name . $extension);
-		/*if (file_exists($tmp_archive)) {
-			unlink($tmp_archive);
-		}*/
-		send_json(null, null);
+		send_json(null, $archive_name . $extension);
 	}
 }
 function extract_archive ($archive_name, $path, $password) {
@@ -512,7 +527,7 @@ switch ($_POST["action"]) {
 	delete_multiple_file($_POST["file"], $_POST["folder"], rtrim($_POST["from"], "/") . "/");
 	break;
 	case 'create_archive':
-	create_archive($_POST["archive_name"], rtrim($_POST["to"], '/') . '/', $_POST["extension"], $_POST["files"]);
+	create_archive($_POST["archive_name"], rtrim($_POST["to"], '/') . '/', $_POST["extension"], $_POST["files"], $_POST["multiple"]);
 	break;
 	case 'extract_archive':
 	extract_archive($_POST["archive_name"], rtrim($_POST["to"], '/') . '/', $_POST["archive_password"]);
