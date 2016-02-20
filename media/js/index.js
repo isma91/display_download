@@ -2,7 +2,7 @@
 /*jslint devel : true*/
 /*global $, document, this, Materialize*/
 $(document).ready(function () {
-    var extension, parent_directory, array_audio, array_video, array_picture, i, j, k, properties, file, archive_name, l, relative_path, encode_uri_component_file_name, m, select_mode, array_selected_file, array_selected_folder, label_for, label_for_id, action_name_selected;
+    var extension, parent_directory, array_audio, array_video, array_picture, i, j, k, properties, file, archive_name, l, relative_path, encode_uri_component_file_name, m, select_mode, array_selected_file, array_selected_folder, label_for, label_for_id, action_name_selected, array_archive, m;
     array_selected_file = [];
     array_selected_folder = [];
     select_mode = "false";
@@ -10,6 +10,7 @@ $(document).ready(function () {
     array_video = ["avi", "ogv", "mpg", "webm", "wmv", "flv", "mkv", "mp4", "mov"];
     array_picture = ["png", "jpg", "bmp"];
     array_code = ["asp", "aspx", "bat", "cfm", "class", "conf", "cpp", "css", "db", "dbf", "dll", "htaccess", "html", "jar", "js", "jsp", "md", "odb", "pdb", "php", "py", "rb", "sql", "sh", "xhtml", "xml"];
+    array_archive = ["tar", "gz", "bz2", "zip", "rar"];
     function get_original_path () {
         "use strict";
         $.post('controllers/get_original_path.php', function (data, textStatus) {
@@ -613,7 +614,7 @@ $(document).ready(function () {
         relative_path = $('#current_path').text().replace($('#original_path').text(), "../").replace("//", "/") + "/";
         relative_path = relative_path.replace('//', '/');
         encode_uri_component_file_name = encodeURIComponent($(this).children('p').text());
-        if (select_mode === false) {
+        if (select_mode === "false") {
             for (i = 0; i < array_audio.length; i = i + 1) {
                 if (extension === array_audio[i]) {
                     $('#audio').remove();
@@ -642,10 +643,13 @@ $(document).ready(function () {
                 display_pdf(relative_path + encode_uri_component_file_name);
             }
             for (l = 0; l < array_code.length; l = l + 1) {
+                console.log(array_code);
                 if (extension === array_code[l]) {
                     send_file_content(encode_uri_component_file_name);
                     break;
                 }
+            }
+            for (m = 0; m < array_archive.length; m = m + 1) {
             }
         }
     });
