@@ -54,11 +54,11 @@ And restart apache2 with :
 ```sudo service apache2 restart```
 
 Make sure the data path is writeable to avoid some write problem. For example :  
-```chmod -R 0777 /path/to/display_download ```  
+```chmod -R 0777 /path/to/display_localhost ```  
 
 Or  
 
-```chown -R www-data:www-data /path/to/display_download ```
+```chown -R www-data:www-data /path/to/display_localhost ```
 
 (Optional) You can change the display.prod.conf like this :  
 ```
