@@ -1,5 +1,5 @@
-# display_download
-##Display a structured download directory
+# display_localhost
+##Display a structured localhost directory
 ###For now, only for LAMP !!
 ####You need to have PHP5.4+
   
