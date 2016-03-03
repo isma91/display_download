@@ -649,7 +649,6 @@ $(document).ready(function () {
                 display_pdf(relative_path + encode_uri_component_file_name);
             }
             for (l = 0; l < array_code.length; l = l + 1) {
-                console.log(array_code);
                 if (extension === array_code[l]) {
                     send_file_content(encode_uri_component_file_name);
                     break;
