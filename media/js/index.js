@@ -2,7 +2,8 @@
 /*jslint devel : true*/
 /*global $, document, this, Materialize*/
 $(document).ready(function () {
-    var extension, parent_directory, array_audio, array_video, array_picture, i, j, k, properties, file, archive_name, l, relative_path, encode_uri_component_file_name, m, select_mode, array_selected_file, array_selected_folder, label_for, label_for_id, action_name_selected, array_archive, m;
+    var extension, parent_directory, array_audio, array_video, array_picture, i, j, k, properties, file, archive_name, l, relative_path, encode_uri_component_file_name, m, select_mode, array_selected_file, array_selected_folder, label_for, label_for_id, action_name_selected, array_archive, m, compteur;
+    compteur = 0;
     array_selected_file = [];
     array_selected_folder = [];
     select_mode = "false";
@@ -23,7 +24,7 @@ $(document).ready(function () {
     }
     function send_path (path) {
         "use strict";
-        var breadcrumb, folders, files, file_count;
+        var breadcrumb, folders, files, file_count, parent_directory;
         file_count = 0;
         if (path !== "") {
             $.post('controllers/list_file.php', {directory: path}, function (data, textStatus) {
@@ -77,7 +78,12 @@ $(document).ready(function () {
                             $('#the_body').append('<div class="row mui-panel"><i class="material-icons prefix menu_icons tooltipped" id="copy" data-position="top" data-tooltip="Copy">content_copy</i><i class="material-icons prefix menu_icons tooltipped" id="remove" data-position="top" data-tooltip="Delete">delete</i><i class="material-icons prefix menu_icons tooltipped" id="archive" data-position="top" data-tooltip="Archive">archive</i></div>');
                             $('#the_body').append('<div class="row mui-panel">There is ' + data.folder.length + ' folder(s) and ' + file_count + ' file(s)</div>');
                             $('#the_body').append('<div class="row mui-panel" id="selection"></div>');
-                            $('#the_body').append('<div class="row"><div class="col s12" id="parent_directory"><i class="material-icons prefix">reply</i>Parent Directory</div><div class="mui-panel" id="path_content"><div class="row">' + folders + files + '</div></div></div>');
+                            if ($('#original_path').text() === $('#current_path').text()) {
+                                parent_directory = '';
+                            } else {
+                                parent_directory = '<div class="col s12" id="parent_directory"><i class="material-icons prefix">reply</i>Parent Directory</div>';
+                            }
+                            $('#the_body').append('<div class="row">' + parent_directory + '<div class="mui-panel" id="path_content"><div class="row">' + folders + files + '</div></div></div>');
                             $('.tooltipped').tooltip({delay: 50});
                         }, 1000);
                     }
@@ -775,12 +781,24 @@ $(document).ready(function () {
     });
     $(document.body).on('click', '#copy', function () {
         selected_mode("multiple_copy");
+        compteur = compteur + 1
+        if (compteur % 2 === 0) {
+            unselect_mode();
+        }
     });
     $(document.body).on('click', '#remove', function () {
         selected_mode("multiple_remove");
+        compteur = compteur + 1
+        if (compteur % 2 === 0) {
+            unselect_mode();
+        }
     });
     $(document.body).on('click', '#archive', function () {
         selected_mode("multiple_archive");
+        compteur = compteur + 1
+        if (compteur % 2 === 0) {
+            unselect_mode();
+        }
     });
     $(document.body).on('click', '.select_file_folder', function () {
         label_for = $(this).attr('for');
