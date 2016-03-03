@@ -27,6 +27,7 @@ foreach ($list_extension as $file) {
 }
 $array_file = array();
 $array_folder = array();
+$extension_available = "false";
 foreach ($list_directory as $file) {
 	if ($file !== ".." && $file !== ".") {
 		if (is_dir($directory.$file)) {
@@ -34,10 +35,16 @@ foreach ($list_directory as $file) {
 		} else {
 			foreach ($array_extension as $extension) {
 				if ($extension === strtolower(pathinfo($file, PATHINFO_EXTENSION))) {
-					$array_file[strtolower(pathinfo($file, PATHINFO_EXTENSION))][] = $file;
+					$extension_available = "true";
 					break;
 				}
 			}
+			if ($extension_available === "true") {
+				$array_file[strtolower(pathinfo($file, PATHINFO_EXTENSION))][] = $file;
+			} else {
+				$array_file["other"][] = $file;
+			}
+			$extension_available = "false";
 		}
 	}
 }
