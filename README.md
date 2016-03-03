@@ -60,6 +60,16 @@ Or
 
 ```chown -R www-data:www-data /path/to/display_localhost ```
 
+------------------------------------------------------------  
+
+Problems :
+----------
+
+MKV video can be seen, but with no sound (to confirm)
+Don't test this project in iceweasel (some troube)
+
+------------------------------------------------------------  
+
 (Optional) You can change the display.prod.conf like this :  
 ```
 DocumentRoot path/to/project/
